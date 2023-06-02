@@ -234,6 +234,7 @@
 					{
 						return this.BanditBoss;
 					}
+					break;
 					
 				case this.Const.EntityType.NomadLeader:
 				case this.Const.EntityType.DesertStalker:
@@ -242,6 +243,7 @@
 					{
 						return this.NomadBoss;
 					}
+					break;
 					
 				case this.Const.EntityType.BarbarianChosen:
 				case this.Const.EntityType.BarbarianChampion:
@@ -249,6 +251,7 @@
 					{
 						return this.BarbarianBoss;
 					}
+					break;
 
 				case this.Const.EntityType.BarbarianMadman:
 					return this.BarbarianBoss;
@@ -259,6 +262,7 @@
 					{
 						return this.GoblinBoss;
 					}
+					break;
 					
 				case this.Const.EntityType.GoblinShaman:
 					return this.GoblinShaman;
@@ -272,12 +276,15 @@
 					{
 						return this.OrcBoss;
 					}
+					break;
 					
 				case this.Const.EntityType.ZombieKnight:
 					if(_entity.m.IsMiniboss)
 					{
 						return this.ZombieBoss;
 					}
+					break;
+
 				case this.Const.EntityType.ZombieBoss:
 					return this.ZombieBoss;
 
@@ -287,6 +294,7 @@
 					{
 						return this.SkeletonBoss;
 					}
+					break;
 				
 				case this.Const.EntityType.SkeletonLich:
 					return this.SkeletonBoss;
@@ -321,16 +329,18 @@
 					return this.Assassin;
 
 				case this.Const.EntityType.Ghoul:
-					if(_entity.getSize())
+					if(_entity.getSize() == 3)
 					{
 						return this.Lv3Ghoul;
 					}
+					break;
 
 				case this.Const.EntityType.SandGolem:
-					if(_entity.getSize())
+					if(_entity.getSize() == 3)
 					{
 						return this.Lv3Sandgolem;
 					}
+					break;
 
 				case this.Const.EntityType.Unhold:
 				case this.Const.EntityType.UnholdFrost:
@@ -543,37 +553,42 @@
 				array_index++;
 			}
 
-			local list_remarkbles = false;
-			local remarkble_list_text = "";
-			local remarkble_list_count = 0;
+			local remarkable_lines = 0;
+			local remarkable_list_text = "";
+			local remarkable_list_count = 0;
 			local num_columns = 5;
 			
-			for(local remarkble_index = 0; remarkble_index < ERemarkable.Num; remarkble_index++)
+			for(local remarkable_index = 0; remarkable_index < ERemarkable.Num; remarkable_index++)
 			{
-				if(killing_remarkables[remarkble_index] > 0 )
+				if(killing_remarkables[remarkable_index] > 0 )
 				{
-					if(remarkble_list_count % num_columns != 0)
+					if(remarkable_list_count % num_columns != 0)
 					{
-						remarkble_list_text += ", "
+						remarkable_list_text += ", "
 					}
-					remarkble_list_text += "[img]gfx/ui/tooltips/orientation/" + ERemarkable.Resources[remarkble_index] + "[/img] "
-											+ killing_remarkables[remarkble_index];
-					remarkble_list_count++;
-					if(remarkble_list_count % num_columns == 0)
+					remarkable_list_text += "[img]gfx/ui/tooltips/orientation/" + ERemarkable.Resources[remarkable_index] + "[/img] "
+											+ killing_remarkables[remarkable_index];
+					remarkable_list_count++;
+					if(remarkable_list_count % num_columns == 0)
 					{
-						if(remarkble_list_count == num_columns)
+						if(remarkable_lines == 0)
 						{
 							tooltips.push({ id = 21, type = "description", text = "Remarkable opponents he vanquished:" });	
 						}
-						tooltips.push({ id = 21 + remarkble_list_count/num_columns, type = "description", text = remarkble_list_text});
-						remarkble_list_text = "";
+						tooltips.push({ id = 21 + remarkable_list_count/num_columns, type = "description", text = remarkable_list_text});
+						remarkable_lines++;
+						remarkable_list_text = "";
 					}
 				}
 			}
 
-			if(remarkble_list_text != "" && remarkble_list_count % num_columns != 0)
+			if(remarkable_list_text != "" && remarkable_list_count % num_columns != 0)
 			{
-				tooltips.push({ id = 21 + (remarkble_list_count+num_columns-1)/num_columns, type = "description", text = remarkble_list_text});
+				if(remarkable_lines == 0)
+				{
+					tooltips.push({ id = 21, type = "description", text = "Remarkable opponents he vanquished:" });	
+				}
+				tooltips.push({ id = 21 + (remarkable_list_count+num_columns-1)/num_columns, type = "description", text = remarkable_list_text});
 			}
 
 			local saved = this.getSavedGolds();
