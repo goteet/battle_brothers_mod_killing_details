@@ -1,8 +1,23 @@
-::mods_registerMod("mod_killing_details", 1, "Record Slained Remarkable Enemies");
+local detail_mod_version = 1;
+
+::mods_registerMod("mod_killing_details",  detail_mod_version, "Record Slained Remarkable Enemies");
+
 
 
 ::mods_queue("mod_killing_details", null, function() 
 {
+	::mods_hookNewObjectOnce("states/world_state", function(world)
+	{
+		local onSerialize = ::mods_getMember(world, "onSerialize");
+		::mods_override(world, "onSerialize", function( _out )
+		{
+			this.World.Flags.set("detail_mod_version", detail_mod_version);
+			onSerialize(_out);
+		});
+	});
+
+
+
 	local ESpecies = 
 	{
 		Humen = 0,
@@ -414,7 +429,7 @@
 		);
 
 		local onInit = ::mods_getMember(player, "onInit");
-		local onInit_ = function()
+		::mods_override(player, "onInit", function()
 		{
 			onInit();
 			local killing_species = this.getKillingSpecies();
@@ -432,15 +447,15 @@
 			{
 				killing_remarkables[index] = 0;
 			}
-		}
-		::mods_override(player, "onInit", onInit_);
+		});
+
 
 		local onSerialize = ::mods_getMember(player, "onSerialize");
-		local onSerialize_ = function( _out )
+		::mods_override(player, "onSerialize", function( _out )
 		{
-			onSerialize( _out );
+			onSerialize(_out);
+
 			_out.writeU32(player.m.DetailStats.SavedGolds);
-			
 			local killing_species = this.getKillingSpecies();
 			for(local index = 0; index < ESpecies.Num; index++)
 			{
@@ -452,30 +467,37 @@
 			{
 				_out.writeU32(killing_remarkables[index]);
 			}
-		};
-		::mods_override(player, "onSerialize", onSerialize_);
+		});
 
+	
 		local onDeserialize = ::mods_getMember(player, "onDeserialize");
-		local onDeserialize_ = function( _in )
+		::mods_override(player, "onDeserialize", function( _in )
 		{
-			onDeserialize( _in );
-			this.m.DetailStats.SavedGolds = _in.readU32();
-			
-			local killing_species = this.getKillingSpecies();
-			local killing_remarkables = this.getKillingRemarkables();
-			killing_species.resize(ESpecies.Num)
-			killing_remarkables.resize(ERemarkable.Num)
+			onDeserialize(_in);
+			if(this.World.Flags.has("detail_mod_version"))
+			{
+				local saved_detail_mod_version = this.World.Flags.get("detail_mod_version");
 
-			for(local index = 0; index < ESpecies.Num; index++)
-			{
-				killing_species[index] = _in.readU32();
+				if(saved_detail_mod_version == 1)
+				{
+					this.m.DetailStats.SavedGolds = _in.readU32();
+					
+					local killing_species = this.getKillingSpecies();
+					local killing_remarkables = this.getKillingRemarkables();
+					killing_species.resize(ESpecies.Num)
+					killing_remarkables.resize(ERemarkable.Num)
+
+					for(local index = 0; index < ESpecies.Num; index++)
+					{
+						killing_species[index] = _in.readU32();
+					}
+					for(local index = 0; index < ERemarkable.Num; index++)
+					{
+						killing_remarkables[index] = _in.readU32();
+					}
+				}
 			}
-			for(local index = 0; index < ERemarkable.Num; index++)
-			{
-				killing_remarkables[index] = _in.readU32();
-			}
-		};
-		::mods_override(player, "onDeserialize", onDeserialize_);
+		});
 
 
 		///
