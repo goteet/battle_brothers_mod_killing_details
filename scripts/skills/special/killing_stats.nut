@@ -47,8 +47,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		if(species_detail_texts.len() > 0)
 		{
 			ret.push({ id = 20, type = "description", text = "The opponents he slained list here:" });
-			local num_lines = (species_detail_texts.len() + num_columns - 1) % num_columns;
-			for(local line_index = 0; line_index < num_lines - 1; line_index += 1)
+			local num_lines = (species_detail_texts.len() + num_columns - 1) / num_columns;
+			for(local line_index = 0; line_index < num_lines; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -99,9 +99,9 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
 		if(remarkable_low_texts.len() > 0)
 		{
-			ret.push({ id = 30, type = "description", text = "\nThe strong opponents he killed:" });
-			local num_lines = (remarkable_low_texts.len() + num_columns - 1) % num_columns;
-			for(local line_index = 0; line_index < num_lines - 1; line_index += 1)
+			ret.push({ id = 30, type = "description", text = "The strong opponents he killed:" });
+			local num_lines = (remarkable_low_texts.len() + num_columns - 1) / num_columns;
+			for(local line_index = 0; line_index < num_lines; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -126,9 +126,9 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
 		if(remarkable_boss_texts.len() > 0)
 		{
-			ret.push({ id = 40, type = "description", text = "\nThe Remarkable opponents he vanquished:" });
-			local num_lines = (remarkable_low_texts.len() + num_columns - 1) % num_columns;
-			for(local line_index = 0; line_index < num_lines - 1; line_index += 1)
+			ret.push({ id = 40, type = "description", text = "The Remarkable opponents he vanquished:" });
+			local num_lines = (remarkable_low_texts.len() + num_columns - 1) / num_columns;
+			for(local line_index = 0; line_index < num_lines; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -163,7 +163,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		}
 		if(unique_text != "")
 		{
-			ret.push({ id = 50, type = "description", text = "\nThe Legenary opponents he conquered:" });
+			ret.push({ id = 50, type = "description", text = "The Legenary opponents he conquered:" });
 			ret.push({ id = 51, type = "description", text = unique_text});
 			description = true;
 		}
@@ -179,15 +179,22 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		if (_targetEntity.getXPValue() > 0)
 		{
 			local actor = this.getContainer().getActor();
-			local species_type = ESpecies.fromEntityType(_targetEntity.getType());
-			if(species_type < ESpecies.Num)
+			local species_type = this.Const.World.ESpecies.fromEntityType(_targetEntity.getType());
+			if(species_type < this.Const.World.ESpecies.Num)
 			{
 				local species = actor.getKillingSpecies();
 				species[species_type] += 1;
 			}
 
-			local remarkable_type = ERemarkable.fromEntity( _targetEntity );
-			if(remarkable_type < ERemarkable.Num)
+			local species_detail_type = this.Const.World.ESpeciesDetails.fromEntityType(_targetEntity.getType());
+			if(species_detail_type < this.Const.World.ESpeciesDetails.Num)
+			{
+				local details = actor.getKillingSpeciesDetails();
+				details[species_detail_type] += 1;
+			}
+
+			local remarkable_type = this.Const.World.ERemarkable.fromEntity( _targetEntity );
+			if(remarkable_type < this.Const.World.ERemarkable.Num)
 			{
 				local remarkables = actor.getKillingRemarkables();
 				remarkables[remarkable_type] += 1;
