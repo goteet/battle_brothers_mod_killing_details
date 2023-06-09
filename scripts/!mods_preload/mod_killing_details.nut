@@ -312,7 +312,7 @@ gt.Const.World.ESpeciesDetails <-
 				return this.Spiders;
 
 			case this.Const.EntityType.Ghoul:
-				return this.Ghous;
+				return this.Ghouls;
 
 			case this.Const.EntityType.Wolf:
 			case this.Const.EntityType.Direwolf:
