@@ -353,20 +353,20 @@ gt.Const.World.ERemarkable <-
 		BarbarianChosen = 12,
 
 		GoblinShaman = 13,
-		GoblinOverseer = 13,
+		GoblinOverseer = 14,
 
-		OrcBerserker = 14,
-		OrcLeader = 15,
+		OrcBerserker = 15,
+		OrcLeader = 16,
 
-		ZombieKnight = 16,
-		Necromancer = 17,
-		SkeletonPriest = 18,
-		Vampire = 19,
-		Geist = 20,
+		ZombieKnight = 17,
+		Necromancer = 18,
+		SkeletonPriest = 19,
+		Vampire = 20,
+		Geist = 21,
 
-		Nightmare = 21,
-		Unhold = 22,
-		Hexe = 23,
+		Nightmare = 22,
+		Unhold = 23,
+		Hexe = 24,
 	End_Low = 24,
 
 	Start_Boss = 25,
