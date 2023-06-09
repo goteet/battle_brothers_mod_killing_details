@@ -182,7 +182,7 @@ gt.Const.World.ESpeciesDetails <-
 	Goblins = 6,
 	Orcs = 7,
 	Zombies = 8,
-	Skeleons = 9,
+	Skeletons = 9,
 	Spiders = 10,
 	Ghouls = 11,
 	Puppets  = 12,
