@@ -101,7 +101,7 @@ gt.Const.World.ESpecies <-
 			case this.Const.EntityType.GoblinLeader:
 			case this.Const.EntityType.GoblinShaman:
 			case this.Const.EntityType.GoblinWolfrider:
-				return this.Greenskin;
+				return this.Greenskins;
 
 			case this.Const.EntityType.MilitaryDonkey:
 			case this.Const.EntityType.CaravanDonkey:
