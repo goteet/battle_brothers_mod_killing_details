@@ -1,4 +1,4 @@
-local detail_mod_version = 1;
+local detail_mod_version = 2;
 
 ::mods_registerMod("mod_killing_details",  detail_mod_version, "Record Slained Remarkable Enemies");
 
@@ -775,6 +775,12 @@ gt.Const.World.ERemarkable <-
 					SpeciesDetails = [],
 					Remarkables = [],
 				},
+				WeaponStats = 
+				{
+					CurrentUsedWeaponIndex = -1,
+					MostUsedWeaponIndex = -1,
+					UsedWeaponRecords = [],
+				},
 				SavedGolds = 0,
 			}
 		);
@@ -800,6 +806,12 @@ gt.Const.World.ERemarkable <-
 		::mods_addMember(player, "player", "getKillingRemarkables", function ()
 			{
 				return this.m.DetailStats.KillingStats.Remarkables;
+			}
+		);
+		
+		::mods_addMember(player, "player", "getWeaponStats", function ()
+			{
+				return this.m.DetailStats.WeaponStats;
 			}
 		);
 
@@ -873,6 +885,24 @@ gt.Const.World.ERemarkable <-
 			{
 				_out.writeU8(killing_remarkables[index]);
 			}
+
+			local weapon_stats = this.getWeaponStats();
+			local records = weapon_stats.UsedWeaponRecords;	
+			records.sort(@(a,b) b.Count<=> a.Count);
+
+			local record_length = records.len();
+			local k_max_record = 8;
+			if(record_length > k_max_record)
+			{
+				record_length = k_max_record;
+			}
+
+			_out.writeU32(record_length);
+			foreach(index, record in records)
+			{
+				_out.writeString(record.Name);
+				_out.writeU32(record.Count);
+			}
 		});
 
 	
@@ -882,7 +912,7 @@ gt.Const.World.ERemarkable <-
 			onDeserialize(_in);
 
 			local saved_detail_mod_version = _in.readU32();
-			if(saved_detail_mod_version == 1)
+			if(saved_detail_mod_version >= 1)
 			{
 				this.m.DetailStats.SavedGolds = _in.readU32();
 				
@@ -916,6 +946,28 @@ gt.Const.World.ERemarkable <-
 				{
 					killing_remarkables[index] = _in.readU8();
 				}
+			}
+
+			if(saved_detail_mod_version == 2)
+			{
+				local weapon_stats = this.getWeaponStats();
+				local records = weapon_stats.UsedWeaponRecords;
+				local length = _in.readU32();
+				local most_used_index = 0;
+				local most_used_count = 0;
+				for(local index = 0; index < length; index+=1)
+				{
+					local Name = _in.readString();
+					local Count = _in.readU32();
+					
+					records.push( {Name = Name, Count = Count});
+					if(most_used_count < Count)
+					{
+						most_used_count = Count;
+						most_used_index = index;
+					}
+				}
+				weapon_stats.CurrentUsedWeaponIndex = weapon_stats.MostUsedWeaponIndex = most_used_index;
 			}
 		});
 
@@ -997,15 +1049,24 @@ gt.Const.World.ERemarkable <-
 			if(saved > 0)
 			{
 				local saved_golds_desc = "Saved [img]gfx/ui/tooltips/money.png[/img] " + saved + " golds .";
-				local saved_golds_desc_item = { id = 35, type = "text", icon = "ui/icons/asset_money.png", text = saved_golds_desc };
+				local saved_golds_desc_item = { id = 70, type = "text", icon = "ui/icons/asset_money.png", text = saved_golds_desc };
 				if(daili_cost_index == -1)
 				{
 					tooltips.push(saved_golds_desc_item);
 				}
 				else
 				{
+					
 					tooltips.insert(daili_cost_index, saved_golds_desc_item);
 				}
+			}
+
+			local weapon_stats = this.getWeaponStats();
+			if(weapon_stats.MostUsedWeaponIndex != -1)
+			{
+				local weapon_name = weapon_stats.UsedWeaponRecords[weapon_stats.MostUsedWeaponIndex].Name;
+				local saved_golds_desc_item = { id = 40, type = "description", text = "His favorite weapon is " +  weapon_name + "."};
+				tooltips.push(saved_golds_desc_item);
 			}
 			return tooltips;
 		};
