@@ -953,8 +953,8 @@ gt.Const.World.ERemarkable <-
 				local weapon_stats = this.getWeaponStats();
 				local records = weapon_stats.UsedWeaponRecords;
 				local length = _in.readU32();
-				local most_used_index = 0;
-				local most_used_count = 0;
+				local most_used_index = -1;
+				local most_used_count = -1;
 				for(local index = 0; index < length; index+=1)
 				{
 					local Name = _in.readString();
