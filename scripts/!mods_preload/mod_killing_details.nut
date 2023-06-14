@@ -857,7 +857,7 @@ gt.Const.World.ERemarkable <-
 			onSerialize(_out);
 
 			_out.writeU32(detail_mod_version);
-			_out.writeU32(player.m.DetailStats.SavedGolds);
+			_out.writeU32(this.m.DetailStats.SavedGolds);
 			local killing_species = this.getKillingSpecies();
 			for(local index = 0; index < this.Const.World.ESpecies.Num; index++)
 			{
@@ -914,8 +914,7 @@ gt.Const.World.ERemarkable <-
 			local saved_detail_mod_version = _in.readU32();
 			if(saved_detail_mod_version >= 1)
 			{
-				this.m.DetailStats.SavedGolds = _in.readU32();
-				
+				this.m.DetailStats.SavedGolds = _in.readU32();				
 				local killing_species = this.getKillingSpecies();
 				local killing_species_details = this.getKillingSpeciesDetails();
 				local killing_remarkables = this.getKillingRemarkables();
@@ -1056,7 +1055,6 @@ gt.Const.World.ERemarkable <-
 				}
 				else
 				{
-					
 					tooltips.insert(daili_cost_index, saved_golds_desc_item);
 				}
 			}
