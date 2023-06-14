@@ -898,8 +898,9 @@ gt.Const.World.ERemarkable <-
 			}
 
 			_out.writeU32(record_length);
-			foreach(index, record in records)
+			for(local index = 0; index < record_length; index+=1)
 			{
+				local record = records[index];
 				_out.writeString(record.Name);
 				_out.writeU32(record.Count);
 			}
