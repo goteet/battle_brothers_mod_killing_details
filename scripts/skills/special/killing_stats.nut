@@ -243,64 +243,67 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		}
 	}
 
-	function onCombatStarted()
+	function onAnySkillUsed( _skill, _targetEntity, _properties )
 	{
-		local actor = this.getContainer().getActor();
-		local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
-		if(item != null)
+		if(_skill.m.IsAttack)
 		{
-			local weapon_stats = actor.getWeaponStats();
-			local used_list = weapon_stats.UsedWeaponRecords;
-
-			if(weapon_stats.CurrentUsedWeaponIndex == -1 || used_list[weapon_stats.CurrentUsedWeaponIndex].Name != item.getName())
+			local actor = this.getContainer().getActor();
+			local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
+			if(item != null)
 			{
-				weapon_stats.CurrentUsedWeaponIndex = -1;
-				foreach(index, record in used_list)
+				
+				local weapon_stats = actor.getWeaponStats();
+				local used_list = weapon_stats.UsedWeaponRecords;
+
+				if(weapon_stats.CurrentUsedWeaponIndex == -1 || used_list[weapon_stats.CurrentUsedWeaponIndex].Name != item.getName())
 				{
-					if(record.Name == item.getName())
+					weapon_stats.CurrentUsedWeaponIndex = -1;
+					foreach(index, record in used_list)
 					{
-						weapon_stats.CurrentUsedWeaponIndex = index;
-						break;
+						if(record.Name == item.getName())
+						{
+							weapon_stats.CurrentUsedWeaponIndex = index;
+							break;
+						}
 					}
 				}
-			}
 
-			if(weapon_stats.CurrentUsedWeaponIndex == -1)
-			{
-				local record = { Name = item.getName(), Count = 1 }; 
-				used_list.push(record);
-				weapon_stats.CurrentUsedWeaponIndex = used_list.len() - 1;
-			}
-			else
-			{
-				used_list[weapon_stats.CurrentUsedWeaponIndex].Count += 1;
-			}
-
-			if(weapon_stats.MostUsedWeaponIndex == -1)
-			{
-				local most_used_weapon_count = 0;
-				foreach(index, record in weapon_stats.UsedWeaponRecords)
+				if(weapon_stats.CurrentUsedWeaponIndex == -1)
 				{
-					if(most_used_weapon_count < record.Count)
-					{
-						most_used_weapon_count = record.Count;
-						weapon_stats.MostUsedWeaponIndex = index;
-					}
+					local record = { Name = item.getName(), Count = 1 }; 
+					used_list.push(record);
+					weapon_stats.CurrentUsedWeaponIndex = used_list.len() - 1;
 				}
-				weapon_stats.MostUsedWeaponIndex = weapon_stats.CurrentUsedWeaponIndex;
-			}
-			else if(weapon_stats.CurrentUsedWeaponIndex != weapon_stats.MostUsedWeaponIndex)
-			{
-				local most_used = used_list[weapon_stats.MostUsedWeaponIndex];
-				local curr_used = used_list[weapon_stats.CurrentUsedWeaponIndex];
-
-				if(most_used.Count < curr_used.Count)
+				else
 				{
+					used_list[weapon_stats.CurrentUsedWeaponIndex].Count += 1;
+				}
+
+				if(weapon_stats.MostUsedWeaponIndex == -1)
+				{
+					local most_used_weapon_count = 0;
+					foreach(index, record in weapon_stats.UsedWeaponRecords)
+					{
+						if(most_used_weapon_count < record.Count)
+						{
+							most_used_weapon_count = record.Count;
+							weapon_stats.MostUsedWeaponIndex = index;
+						}
+					}
 					weapon_stats.MostUsedWeaponIndex = weapon_stats.CurrentUsedWeaponIndex;
+				}
+				else if(weapon_stats.CurrentUsedWeaponIndex != weapon_stats.MostUsedWeaponIndex)
+				{
+					local most_used = used_list[weapon_stats.MostUsedWeaponIndex];
+					local curr_used = used_list[weapon_stats.CurrentUsedWeaponIndex];
+
+					if(most_used.Count < curr_used.Count)
+					{
+						weapon_stats.MostUsedWeaponIndex = weapon_stats.CurrentUsedWeaponIndex;
+					}
 				}
 			}
 		}
 	}
-
 });
 
