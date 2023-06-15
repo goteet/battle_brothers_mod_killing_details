@@ -133,7 +133,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			ret.push({ id = 20, type = "description", text = "The opponents he slained list here:" });
 			local num_lines = (species_detail_texts.len() + num_columns - 1) / num_columns;
-			for(local line_index = 0; line_index < num_lines; line_index += 1)
+			local final = false;
+			for(local line_index = 0; line_index < num_lines && !final; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -143,6 +144,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 					if(text_index == species_detail_texts.len() - 1)
 					{
 						line_text += "."; 
+						final = true;
 						break;
 					}
 					else
@@ -158,7 +160,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			ret.push({ id = 30, type = "description", text = "The strong opponents he killed:" });
 			local num_lines = (remarkable_low_texts.len() + num_columns - 1) / num_columns;
-			for(local line_index = 0; line_index < num_lines; line_index += 1)
+			local final = false;
+			for(local line_index = 0; line_index < num_lines && !final; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -167,7 +170,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 					line_text += remarkable_low_texts[text_index];
 					if(text_index == remarkable_low_texts.len() - 1)
 					{
-						line_text += "."; 
+						line_text += ".";
+						final = true;
 						break;
 					}
 					else
@@ -184,7 +188,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			ret.push({ id = 40, type = "description", text = "The Remarkable opponents he vanquished:" });
 			local num_lines = (remarkable_low_texts.len() + num_columns - 1) / num_columns;
-			for(local line_index = 0; line_index < num_lines; line_index += 1)
+			local final = false;
+			for(local line_index = 0; line_index < num_lines && !final; line_index += 1)
 			{
 				local line_text = "";
 				for(local index = 0; index < num_columns; index += 1)
@@ -194,6 +199,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 					if(text_index == remarkable_boss_texts.len() - 1)
 					{
 						line_text += "."; 
+						final = true;
 						break;
 					}
 					else
