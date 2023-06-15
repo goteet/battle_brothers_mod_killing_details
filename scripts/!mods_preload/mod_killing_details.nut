@@ -1077,9 +1077,9 @@ gt.Const.World.ERemarkable <-
 	///
 	// Accumulate Saved Golds
 	///
-	::mods_hookNewObjectOnce("states/world/asset_manager", function(assetManger)
+	::mods_hookNewObjectOnce("states/world/asset_manager", function(assetManager)
 	{
-		local update = ::mods_getMember(assetManger, "update");
+		local update = ::mods_getMember(assetManager, "update");
 		local update_ = function( _worldState )
 		{
 			if (this.World.getTime().Days > this.m.LastDayPaid && this.World.getTime().Hours > 8 && this.m.IsConsumingAssets)
@@ -1097,6 +1097,6 @@ gt.Const.World.ERemarkable <-
 			}
 			update( _worldState );
 		}
-		::mods_override(assetManger, "update", update_);
+		::mods_override(assetManager, "update", update_);
 	});
 });
