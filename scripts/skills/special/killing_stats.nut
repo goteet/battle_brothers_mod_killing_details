@@ -251,7 +251,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
 	function onAnySkillUsed( _skill, _targetEntity, _properties )
 	{
-		if(_skill.m.IsAttack)
+		if(_skill.m.IsAttack && _skill.m.IsWeaponSkill && !_skill.m.IsOffensiveToolSkill)
 		{
 			local actor = this.getContainer().getActor();
 			local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
