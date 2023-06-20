@@ -891,10 +891,28 @@ gt.Const.World.ERemarkable <-
 			records.sort(@(a,b) b.Count<=> a.Count);
 
 			local record_length = records.len();
-			local k_max_record = 8;
+			
+			local k_max_record = 8 + 1;
 			if(record_length > k_max_record)
 			{
 				record_length = k_max_record;
+			}
+
+			local last_record_count = 0;
+			if(record_length > 1 && records[0].Count > 1)
+			{
+				record_length -=1;
+				local last_record_count = records[record_length].Count;
+				for(local index = 0; index < record_length; index+=1)
+				{
+					local record = records[index];
+					record.Count -= last_record_count;
+					if(record.Count == 0)
+					{
+						record_length = index;
+						break;
+					}
+				}
 			}
 
 			_out.writeU32(record_length);
