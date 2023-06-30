@@ -257,16 +257,16 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 			local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
 			if(item != null)
 			{
-				
 				local weapon_stats = actor.getWeaponStats();
 				local used_list = weapon_stats.UsedWeaponRecords;
+				local item_name =  item.getName();
 
-				if(weapon_stats.CurrentUsedWeaponIndex == -1 || used_list[weapon_stats.CurrentUsedWeaponIndex].Name != item.getName())
+				if(weapon_stats.CurrentUsedWeaponIndex == -1 || used_list[weapon_stats.CurrentUsedWeaponIndex].Name != item_name)
 				{
 					weapon_stats.CurrentUsedWeaponIndex = -1;
 					foreach(index, record in used_list)
 					{
-						if(record.Name == item.getName())
+						if(record.Name == item_name)
 						{
 							weapon_stats.CurrentUsedWeaponIndex = index;
 							break;
@@ -276,7 +276,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
 				if(weapon_stats.CurrentUsedWeaponIndex == -1)
 				{
-					local record = { Name = item.getName(), Count = 1 }; 
+					local record = { Name = item_name, Count = 1 }; 
 					used_list.push(record);
 					weapon_stats.CurrentUsedWeaponIndex = used_list.len() - 1;
 				}
@@ -296,7 +296,6 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 							weapon_stats.MostUsedWeaponIndex = index;
 						}
 					}
-					weapon_stats.MostUsedWeaponIndex = weapon_stats.CurrentUsedWeaponIndex;
 				}
 				else if(weapon_stats.CurrentUsedWeaponIndex != weapon_stats.MostUsedWeaponIndex)
 				{
