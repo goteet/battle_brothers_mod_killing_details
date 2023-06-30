@@ -645,6 +645,9 @@ gt.Const.World.ERemarkable <-
 
 			case this.Const.EntityType.GoblinLeader:
 				return this.GoblinOverseer;
+
+			case this.Const.EntityType.OrcBerserker:
+				return this.OrcBerserker;
 				
 			case this.Const.EntityType.OrcWarrior:
 			case this.Const.EntityType.OrcWarlord:
