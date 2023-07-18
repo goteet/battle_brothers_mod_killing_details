@@ -297,7 +297,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 						}
 					}
 				}
-				else if(weapon_stats.CurrentUsedWeaponIndex != weapon_stats.MostUsedWeaponIndex)
+				
+				if(weapon_stats.CurrentUsedWeaponIndex != weapon_stats.MostUsedWeaponIndex)
 				{
 					local most_used = used_list[weapon_stats.MostUsedWeaponIndex];
 					local curr_used = used_list[weapon_stats.CurrentUsedWeaponIndex];

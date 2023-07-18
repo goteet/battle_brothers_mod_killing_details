@@ -989,6 +989,11 @@ gt.Const.World.ERemarkable <-
 					}
 				}
 				weapon_stats.CurrentUsedWeaponIndex = weapon_stats.MostUsedWeaponIndex = most_used_index;
+
+				foreach(record in records)
+				{
+					this.logInfo("name=" + record.Name + ", count=" + record.Count);
+				}
 			}
 		});
 
