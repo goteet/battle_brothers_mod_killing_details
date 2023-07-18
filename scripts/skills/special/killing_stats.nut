@@ -187,7 +187,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		if(remarkable_boss_texts.len() > 0)
 		{
 			ret.push({ id = 40, type = "description", text = "The Remarkable opponents he vanquished:" });
-			local num_lines = (remarkable_low_texts.len() + num_columns - 1) / num_columns;
+			local num_lines = (remarkable_boss_texts.len() + num_columns - 1) / num_columns;
 			local final = false;
 			for(local line_index = 0; line_index < num_lines && !final; line_index += 1)
 			{
