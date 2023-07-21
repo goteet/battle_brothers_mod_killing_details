@@ -226,7 +226,7 @@ gt.Const.World.ESpeciesDetails <-
 			case this.Const.EntityType.HedgeKnight:
 			case this.Const.EntityType.Swordmaster:
 			case this.Const.EntityType.MasterArcher:
-				return this.Mecenaries;
+				return this.Mercenaries;
 
 			case this.Const.EntityType.Militia:
 			case this.Const.EntityType.MilitiaRanged:
