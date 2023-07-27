@@ -109,7 +109,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 			}
 			else
 			{
-				participate_text = ", but has no kills yet.";
+				participate_text += ", but has no kills yet.";
 			}
 			ret.push({ id = 2, type = "description", text = participate_text });
 		}
