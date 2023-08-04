@@ -1,4 +1,4 @@
-local detail_mod_version = 2;
+local detail_mod_version = 3;
 
 ::mods_registerMod("mod_killing_details",  detail_mod_version, "Record Slained Remarkable Enemies");
 
@@ -213,6 +213,7 @@ gt.Const.World.ESpeciesDetails <-
 	{
 		switch(_type)
 		{
+			//case this.Const.EntityType.Cultist:
 			case this.Const.EntityType.BanditThug:
 			case this.Const.EntityType.BanditPoacher:
 			case this.Const.EntityType.BanditMarksman:
@@ -220,6 +221,7 @@ gt.Const.World.ESpeciesDetails <-
 			case this.Const.EntityType.BanditLeader:
 				return this.Bandits;
 
+			//case this.Const.EntityType.Peasant:
 			case this.Const.EntityType.BountyHunter:
 			case this.Const.EntityType.Mercenary:
 			case this.Const.EntityType.MercenaryRanged:
@@ -228,6 +230,8 @@ gt.Const.World.ESpeciesDetails <-
 			case this.Const.EntityType.MasterArcher:
 				return this.Mercenaries;
 
+			//case this.Const.EntityType.CaravanHand:
+			//case this.Const.EntityType.CaravanGuard:
 			case this.Const.EntityType.Militia:
 			case this.Const.EntityType.MilitiaRanged:
 			case this.Const.EntityType.MilitiaVeteran:
@@ -252,12 +256,12 @@ gt.Const.World.ESpeciesDetails <-
 			case this.Const.EntityType.DesertDevil:
 				return this.Nomads;
 
+			//case this.Const.EntityType.Slave:
 			case this.Const.EntityType.Conscript:
 			case this.Const.EntityType.Gunner:
 			case this.Const.EntityType.Officer:
 			case this.Const.EntityType.Engineer:
 			case this.Const.EntityType.Assassin:
-			case this.Const.EntityType.Slave:
 			case this.Const.EntityType.Gladiator:
 			case this.Const.EntityType.Mortar:
 				return this.SouthernArmies;
@@ -857,9 +861,8 @@ gt.Const.World.ERemarkable <-
 		local onSerialize = ::mods_getMember(player, "onSerialize");
 		::mods_override(player, "onSerialize", function( _out )
 		{
+			this.m.LifetimeStats.CurrentWeaponUses = detail_mod_version;
 			onSerialize(_out);
-
-			_out.writeU32(detail_mod_version);
 			_out.writeU32(this.m.DetailStats.SavedGolds);
 			local killing_species = this.getKillingSpecies();
 			for(local index = 0; index < this.Const.World.ESpecies.Num; index++)
@@ -895,14 +898,15 @@ gt.Const.World.ERemarkable <-
 
 			local record_length = records.len();
 			
-			local k_max_record = 8 + 1;
-			if(record_length > k_max_record)
+			//shrink records.
+			local kNumMaxRecords = 8;
+			if(record_length > kNumMaxRecords + 1)
 			{
-				record_length = k_max_record;
+				record_length = kNumMaxRecords + 1;
 			}
 
 			local last_record_count = 0;
-			if(record_length > 1 && records[0].Count > 1)
+			if(record_length > kNumMaxRecords && records[0].Count > 1)
 			{
 				record_length -=1;
 				local last_record_count = records[record_length].Count;
@@ -918,12 +922,18 @@ gt.Const.World.ERemarkable <-
 				}
 			}
 
+			local record_offset = 0;
+			if(record_length > 0 && records[record_length - 1].Count > 100)
+			{
+				record_offset = 50;
+			}
+
 			_out.writeU32(record_length);
 			for(local index = 0; index < record_length; index+=1)
 			{
 				local record = records[index];
 				_out.writeString(record.Name);
-				_out.writeU32(record.Count);
+				_out.writeU32(record.Count - record_offset);
 			}
 		});
 
@@ -933,10 +943,10 @@ gt.Const.World.ERemarkable <-
 		{
 			onDeserialize(_in);
 
-			local saved_detail_mod_version = _in.readU32();
-			if(saved_detail_mod_version >= 1)
+			local saved_detail_mod_version = this.m.LifetimeStats.CurrentWeaponUses;
+			if(saved_detail_mod_version >= 3)
 			{
-				this.m.DetailStats.SavedGolds = _in.readU32();				
+				this.m.DetailStats.SavedGolds = _in.readU32();
 				local killing_species = this.getKillingSpecies();
 				local killing_species_details = this.getKillingSpeciesDetails();
 				local killing_remarkables = this.getKillingRemarkables();
@@ -967,10 +977,7 @@ gt.Const.World.ERemarkable <-
 				{
 					killing_remarkables[index] = _in.readU8();
 				}
-			}
 
-			if(saved_detail_mod_version == 2)
-			{
 				local weapon_stats = this.getWeaponStats();
 				local records = weapon_stats.UsedWeaponRecords;
 				local length = _in.readU32();
@@ -980,7 +987,7 @@ gt.Const.World.ERemarkable <-
 				{
 					local Name = _in.readString();
 					local Count = _in.readU32();
-					
+						
 					records.push( {Name = Name, Count = Count});
 					if(most_used_count < Count)
 					{
@@ -989,11 +996,6 @@ gt.Const.World.ERemarkable <-
 					}
 				}
 				weapon_stats.CurrentUsedWeaponIndex = weapon_stats.MostUsedWeaponIndex = most_used_index;
-
-				foreach(record in records)
-				{
-					this.logInfo("name=" + record.Name + ", count=" + record.Count);
-				}
 			}
 		});
 

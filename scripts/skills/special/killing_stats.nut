@@ -82,12 +82,8 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		local participate_text = "";
 		if(battles > 0)
 		{
-			participate_text = "He participate " + battles + " battle";
-			if(battles > 1)
-			{
-				participate_text += "s";
-			}
-			
+			participate_text = "He participate " + battles + (battles > 1 ? " battles" : " battle");
+						
 			if(time > 1)
 			{
 				participate_text += " in " + time + " days";
@@ -101,23 +97,79 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 				participate_text += " at the first day he join the company";
 			}
 
+			local kill_count = actor.m.LifetimeStats.Kills;
 			
-			local has_any_kills = species_detail_texts.len() > 0 || remarkable_low_texts.len() > 0 || remarkable_boss_texts.len() > 0 || unique_text != "";
-			if(has_any_kills)
+			if(kill_count > 0)
 			{
-				participate_text += ".";
+				local single_kill = kill_count == 1;
+				participate_text += " and has " + kill_count + (single_kill ? " kill" : " kills");
+				local has_killing_records = species_detail_texts.len() > 0 || remarkable_low_texts.len() > 0 || remarkable_boss_texts.len() > 0 || unique_text != "";
+				if(has_killing_records)
+				{
+					local index_start = 0;
+					local index_end = this.Const.World.ESpecies.Num - 1;
+					local killing_species = actor.getKillingSpecies();
+					while(index_start < this.Const.World.ESpecies.Num && killing_species[index_start] == 0)
+					{
+						index_start++;
+					}
+					while(index_end > index_start && killing_species[index_end] == 0)
+					{
+						index_end--;
+					}
+					if(index_start < this.Const.World.ESpecies.Num)
+					{
+						participate_text += ", including " 
+									+ killing_species[index_start] 
+									+ " " 
+									+ this.Const.World.ESpecies.Names[(killing_species[index_start] == 1 ? index_start*2 : index_start*2+1)];
+						
+						if(index_start != index_end)
+						{
+							for(index_start++; index_start < index_end; index_start++)
+							{
+								if(killing_species[index_start] > 0)
+								{
+									participate_text += ", "
+												+ killing_species[index_start] + " " 
+												+ this.Const.World.ESpecies.Names[(killing_species[index_start] == 1 ? index_start*2 : index_start*2+1)];
+													
+								}
+							}
+
+							participate_text += " and "
+										+ killing_species[index_start] + " " 
+										+ this.Const.World.ESpecies.Names[(killing_species[index_start] == 1 ? index_start*2 : index_start*2+1)]
+										+ ".";
+						}
+						else
+						{
+							participate_text += ".";
+						}
+					}
+					else
+					{
+						participate_text += ".";
+					}
+				}
+				else
+				{
+					participate_text += ", but we couldn't remember what things he killed.";
+				}
 			}
 			else
 			{
 				participate_text += ", but has no kills yet.";
 			}
+
+			
 			ret.push({ id = 2, type = "description", text = participate_text });
 		}
 		else
 		{
 			if(time > 0)
 			{
-				participate_text = "He joined the company " + time + "days, but doing no kills yet.";
+				participate_text = "He joined the company " + time + "days, but has no kills yet.";
 			}
 			else
 			{
@@ -131,7 +183,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		local num_columns = 5;
 		if(species_detail_texts.len() > 0)
 		{
-			ret.push({ id = 20, type = "description", text = "The opponents he slained list here:" });
+			ret.push({ id = 20, type = "description", text = "The opponents he slained in each type:" });
 			local num_lines = (species_detail_texts.len() + num_columns - 1) / num_columns;
 			local final = false;
 			for(local line_index = 0; line_index < num_lines && !final; line_index += 1)
