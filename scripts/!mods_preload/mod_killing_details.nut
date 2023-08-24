@@ -89,7 +89,8 @@
 					if (bro.getDailyCost() > 0 && this.m.Money > spend_money)
 					{
 						spend_money += bro.getDailyCost();
-						bro.m.DetailStats.SavedGolds += bro.getDailyCost();
+						local skill = bro.m.Skills.getSkillByID("special.killing_stats");
+						skill.m.SavedGolds += bro.getDailyCost();
 					}
 				}
 			}

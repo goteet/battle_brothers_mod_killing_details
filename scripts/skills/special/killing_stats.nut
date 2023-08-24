@@ -1084,14 +1084,13 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 			local species_detail_type = ESpeciesDetails.fromEntityType(_targetEntity.getType());
 			if(species_detail_type < ESpeciesDetails.Num)
 			{
-				details[species_detail_type] += 1;
+				this.m.KillingStats.SpeciesDetails[species_detail_type] += 1;
 			}
 
 			local remarkable_type = ERemarkable.fromEntity( _targetEntity );
 			if(remarkable_type < ERemarkable.Num)
 			{
-				local remarkables = this.getKillingRemarkables();
-				remarkables[remarkable_type] += 1;
+				this.m.KillingStats.Remarkables[remarkable_type] += 1;
 			}
 		}
 	}
