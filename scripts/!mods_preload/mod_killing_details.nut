@@ -9,6 +9,7 @@
 		{
 			setStartValuesEx(_backgrounds, _addTraits);
 			this.m.Skills.add(this.new("scripts/skills/special/killing_stats"));
+			this.m.Skills.add(this.new("scripts/skills/special/battling_stats"));
 		});
 
 		local getRosterTooltip = ::mods_getMember(player, "getRosterTooltip");
@@ -68,6 +69,21 @@
 				}
 			}
 			return tooltips;
+		});
+
+		local onDeserialize = ::mods_getMember(player, "onDeserialize");
+		::mods_override(player, "onDeserialize", function(_in)
+		{
+			onDeserialize(_in);
+			if(!this.m.Skills.getSkillByID("special.killing_stats"))
+			{
+				this.m.Skills.add(this.new("scripts/skills/special/killing_stats"));
+			}
+
+			if(!this.m.Skills.getSkillByID("special.battling_stats"))
+			{
+				this.m.Skills.add(this.new("scripts/skills/special/battling_stats"));
+			}
 		});
     });
 
