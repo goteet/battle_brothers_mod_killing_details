@@ -41,51 +41,72 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			}
 		];
 
-		ret.push({ id = 10, type = "description", text = "Damage Dealt(HP/Armor)=" + this.m.DamageDealtHitpoints + "/" + this.m.DamageDealtArmor});
+		ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png", 	text = "Damage Dealt(HP)=" + this.m.DamageDealtHitpoints});
+		ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = "Damage Dealt(Armor)=" + this.m.DamageDealtArmor});
 
-		ret.push({ id = 20, type = "description", text = "Melee Attack=" + this.m.MeleeAttack});
-		ret.push({ 
-			id = 21,
-			type = "description",
-			text = "Melee Landed=" + this.m.MeleeLanded 
-				+ ", Melee Hit Rate=" 
-				+ this.Math.round(100 * (this.m.MeleeLanded * 1.0 / this.m.MeleeAttack)) 
-				+ "%"
-		});
+		ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = "Melee Attack=" + this.m.MeleeAttack});
+		if(this.m.MeleeAttack > 0)
+		{
+			ret.push({ 
+				id = 13,
+				type = "text",
+				icon = "ui/icons/damage_dealt.png",
+				text = "Melee Landed=" + this.m.MeleeLanded 
+					+ ", Melee Rate=" 
+					+ (this.m.MeleeAttack == 0 ? 0 : this.Math.round(100 * (this.m.MeleeLanded * 1.0 / this.m.MeleeAttack)))
+					+ "%"
+			});
+		}
 
-		ret.push({ id = 20, type = "description", text = "Ranged Attack=" + this.m.RangeAttack});
-		ret.push({ 
-			id = 21,
-			type = "description",
-			text = "Ranged Landed=" + this.m.RangeLanded 
-				+ ", Ranged Hit Rate=" 
-				+ this.Math.round(100 * (this.m.RangeLanded * 1.0 / this.m.RangeAttack)) 
-				+ "%"
-		});
+		ret.push({ id = 14, type = "text", icon = "ui/icons/ranged_skill.png",		text = "Ranged Attack=" + this.m.RangeAttack});
+		if(this.m.RangeAttack > 0)
+		{
+			ret.push({ 
+				id = 15,
+				type = "text",
+				icon = "ui/icons/ranged_skill.png",
+				text = "Ranged Landed=" + this.m.RangeLanded 
+					+ ", Ranged Rate=" 
+					+ (this.m.RangeAttack == 0 ? 0 : this.Math.round(100 * (this.m.RangeLanded * 1.0 / this.m.RangeAttack))) 
+					+ "%"
+			});
+		}
 
-		ret.push({ id = 11, type = "description", text = "Damage Receive(HP/Armor)=" + this.m.DamageReceiveHitpoints + "/" + this.m.DamageReceiveArmor});
-		ret.push({
-			id = 23,
-			type = "description", 
-			text = "Being Hit=" + this.m.BeingMeleeLanded 
-				+ ", Melee Dodge Rate=" 
-				+ this.Math.round(100 * (1.0 - this.m.BeingMeleeLanded * 1.0 / this.m.BeingMeleeAttack)) 
-				+ "%"
-		});
-		ret.push({
-			id = 24,
-			type = "description", 
-			text = "Being Shot=" + this.m.BeingRangeLanded 
-				+ ", Ranged Dodge Rate=" 
-				+ this.Math.round(100 * (1.0 - this.m.BeingRangeLanded * 1.0 / this.m.BeingRangeLanded)) 
-				+ "%"
-		});
+		ret.push({ id = 21, type = "text", icon = "ui/icons/damage_received.png",	text = "Damage Received(HP)=" + this.m.DamageReceiveHitpoints});
+		ret.push({ id = 22, type = "text", icon = "ui/icons/armor_damage.png",	text = "Damage Received(Armor)=" + this.m.DamageReceiveArmor});
 
-		if(this.m.ExecutionerPerkLanded > 0 || this.m.ExecutionerPerkAttack > 0)
+		if(this.m.BeingMeleeAttack > 0)
 		{
 			ret.push({
-				id = 22,
-				type = "description", 
+				id = 23,
+				type = "text",
+				icon = "ui/icons/shield_damage.png",
+				text = "Being Hit=" + this.m.BeingMeleeLanded 
+					+ ", Melee Dodge=" 
+					+ (this.m.BeingMeleeAttack == 0 ? 0 : this.Math.round(100 * (1.0 - this.m.BeingMeleeLanded * 1.0 / this.m.BeingMeleeAttack)))
+					+ "%"
+			});
+		}
+
+		if(this.m.BeingRangeAttack > 0)
+		{
+			ret.push({
+				id = 24,
+				type = "text",
+				icon = "ui/icons/ranged_defense.png",
+				text = "Being Shot=" + this.m.BeingRangeLanded 
+					+ ", Ranged Dodge=" 
+					+ (this.m.BeingRangeAttack == 0 ? 0 :this.Math.round(100 * (1.0 - this.m.BeingRangeLanded * 1.0 / this.m.BeingRangeAttack)))
+					+ "%"
+			});
+		}
+
+		if(this.m.ExecutionerPerkAttack > 0)
+		{
+			ret.push({
+				id = 31,
+				type = "text",
+				icon = "ui/perks/perk_16.png",
 				text = "Executioner=" + this.m.ExecutionerPerkLanded
 					+ ", Effective Rate=" 
 					+ this.Math.round(100 * (this.m.ExecutionerPerkLanded * 1.0 / this.m.ExecutionerPerkAttack)) 
