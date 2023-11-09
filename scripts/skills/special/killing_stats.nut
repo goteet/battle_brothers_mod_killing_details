@@ -1095,7 +1095,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		}
 	}
 
-	function onAnySkillUsed( _skill, _targetEntity, _properties )
+	function onCalculateFavoriteWeapon(_skill)
 	{
 		if(_skill.m.IsAttack && _skill.m.IsWeaponSkill && !_skill.m.IsOffensiveToolSkill)
 		{
@@ -1155,6 +1155,16 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 				}
 			}
 		}
+	}
+
+	function onTargetHit( _skill, _targetEntity, _bodyPart, _damageInflictedHitpoints, _damageInflictedArmor )
+	{
+		this.onCalculateFavoriteWeapon(_skill)
+	}
+
+	function onTargetMissed( _skill, _targetEntity )
+	{
+		this.onCalculateFavoriteWeapon(_skill)
 	}
 
 	function onSerialize( _out )

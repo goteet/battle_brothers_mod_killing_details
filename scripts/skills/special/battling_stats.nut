@@ -32,7 +32,9 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		LastBeingMeleeAttack = 0,
 		LastBeingMeleeLanded = 0,
 		LastBeingRangeAttack = 0,
-		LastBeingRangeLanded = 0
+		LastBeingRangeLanded = 0,
+
+		NineLivesPerkActivatedThisBattle = 0
 	},
 
 
@@ -143,7 +145,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				? "once."
 				: 	(this.m.NineLivesPerkActivated == 2
 						? "twice."
-						: this.m.NineLivesPerkActivated + "times."
+						: this.m.NineLivesPerkActivated + " times."
 					);
 
 			ret.push({
@@ -248,6 +250,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.m.LastBeingMeleeLanded = 0;
 		this.m.LastBeingRangeAttack = 0;
 		this.m.LastBeingRangeLanded = 0;
+		this.m.NineLivesPerkActivatedThisBattle = 0;
 	}
 
 	function onBeforeTargetHit( _skill, _targetEntity, _hitInfo )
@@ -363,11 +366,11 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				if(item.isItemType(this.Const.Items.ItemType.MeleeWeapon))
 				{
 					this.m.BeingMeleeAttack += 1;
-					this.m.BeingMeleeAttack += 1;
+					this.m.LastBeingMeleeAttack += 1;
 				}
 				if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
 				{
-					this.m.LastBeingRangeAttack += 1;
+					this.m.BeingRangeAttack += 1;
 					this.m.LastBeingRangeAttack += 1;
 				}
 			}
@@ -377,18 +380,20 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	function onTurnEnd()
 	{
 		local perk9L = this.getContainer().getSkillByID("perk.nine_lives");
-		if(perk9L != null && perk9L.isSpent())
+		if(perk9L != null && perk9L.isSpent() && this.m.NineLivesPerkActivatedThisBattle == 0)
 		{
 			this.m.NineLivesPerkActivated +=1 ;
+			this.m.NineLivesPerkActivatedThisBattle = 1;
 		}
 	}
 
 	function onTurnStart()
 	{
 		local perk9L = this.getContainer().getSkillByID("perk.nine_lives");
-		if(perk9L != null && perk9L.isSpent())
+		if(perk9L != null && perk9L.isSpent() && this.m.NineLivesPerkActivatedThisBattle == 0)
 		{
 			this.m.NineLivesPerkActivated +=1 ;
+			this.m.NineLivesPerkActivatedThisBattle = 1;
 		}
 	}
 
