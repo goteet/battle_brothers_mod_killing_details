@@ -17,7 +17,25 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		ExecutionerPerkAttack = 0,
 		ExecutionerPerkLanded = 0,
+
+		NineLivesPerkActivated = 0,
+
+		LastDamageDealtHitpoints = 0,
+		LastDamageDealtArmor = 0,
+		LastMeleeAttack = 0,
+		LastMeleeLanded = 0,
+		LastRangeAttack = 0,
+		LastRangeLanded = 0,
+
+		LastDamageReceiveHitpoints = 0,
+		LastDamageReceiveArmor = 0,
+		LastBeingMeleeAttack = 0,
+		LastBeingMeleeLanded = 0,
+		LastBeingRangeAttack = 0,
+		LastBeingRangeLanded = 0
 	},
+
+
 	function create()
 	{
 		this.m.ID = "special.battling_stats";
@@ -41,63 +59,68 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			}
 		];
 
-		ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png", 	text = "Damage Dealt(HP)=" + this.m.DamageDealtHitpoints});
-		ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = "Damage Dealt(Armor)=" + this.m.DamageDealtArmor});
+		local HPDamageText = "Dealt=" + this.m.DamageDealtHitpoints +
+			", Recieved=" + this.m.DamageReceiveHitpoints +
+			", Rate=" + (this.m.DamageReceiveHitpoints == 0 
+							? this.m.DamageDealtHitpoints
+							: this.Math.round(100 * this.m.DamageDealtHitpoints / this.m.DamageReceiveHitpoints)
+						) + "%";
 
-		ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = "Melee Attack=" + this.m.MeleeAttack});
-		if(this.m.MeleeAttack > 0)
-		{
-			ret.push({ 
-				id = 13,
-				type = "text",
-				icon = "ui/icons/damage_dealt.png",
-				text = "Melee Landed=" + this.m.MeleeLanded 
-					+ ", Melee Rate=" 
-					+ (this.m.MeleeAttack == 0 ? 0 : this.Math.round(100 * (this.m.MeleeLanded * 1.0 / this.m.MeleeAttack)))
-					+ "%"
-			});
-		}
+		local ArmorDamageText = "Dealt="  + this.m.DamageDealtArmor + 
+			", Recieved=" + this.m.DamageReceiveArmor + 
+			", Rate=" + (this.m.DamageReceiveArmor == 0 
+							? this.m.DamageDealtArmor
+							: this.Math.round(100 * this.m.DamageDealtArmor / this.m.DamageReceiveArmor)
+						) + "%";
+				
+		local MeleeAttackText = "Attack=" + this.m.MeleeAttack +
+			", Landed=" + this.m.MeleeLanded  + 
+			", Rate=" + (this.m.MeleeAttack == 0 
+							? this.m.MeleeLanded
+							: this.Math.round(100.0 * this.m.MeleeLanded / this.m.MeleeAttack)
+						) + "%";
 
-		ret.push({ id = 14, type = "text", icon = "ui/icons/ranged_skill.png",		text = "Ranged Attack=" + this.m.RangeAttack});
-		if(this.m.RangeAttack > 0)
-		{
-			ret.push({ 
-				id = 15,
-				type = "text",
-				icon = "ui/icons/ranged_skill.png",
-				text = "Ranged Landed=" + this.m.RangeLanded 
-					+ ", Ranged Rate=" 
-					+ (this.m.RangeAttack == 0 ? 0 : this.Math.round(100 * (this.m.RangeLanded * 1.0 / this.m.RangeAttack))) 
-					+ "%"
-			});
-		}
+		local RangedAttackText = "Attack=" + this.m.RangeAttack +
+			", Landed=" + this.m.RangeLanded  + 
+			", Rate=" + (this.m.RangeAttack == 0 
+							? this.m.RangeLanded
+							: this.Math.round(100.0 * this.m.RangeLanded / this.m.RangeAttack)
+						) + "%";
 
-		ret.push({ id = 21, type = "text", icon = "ui/icons/damage_received.png",	text = "Damage Received(HP)=" + this.m.DamageReceiveHitpoints});
-		ret.push({ id = 22, type = "text", icon = "ui/icons/armor_damage.png",	text = "Damage Received(Armor)=" + this.m.DamageReceiveArmor});
+		ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png",	text = HPDamageText});
+		ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = ArmorDamageText});
+		ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
+		ret.push({ id = 13, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
 
 		if(this.m.BeingMeleeAttack > 0)
 		{
+			local BeingAttackMeleeText = "Being Hit=" + this.m.BeingMeleeLanded 
+					+ ", Dodge Rate=" 
+					+ (this.m.BeingMeleeAttack == 0 
+						? "-"
+						: this.Math.round(100.0 * (this.m.BeingMeleeAttack - this.m.BeingMeleeLanded) / this.m.BeingMeleeAttack)
+						) + "%";
 			ret.push({
 				id = 23,
 				type = "text",
 				icon = "ui/icons/shield_damage.png",
-				text = "Being Hit=" + this.m.BeingMeleeLanded 
-					+ ", Melee Dodge=" 
-					+ (this.m.BeingMeleeAttack == 0 ? 0 : this.Math.round(100 * (1.0 - this.m.BeingMeleeLanded * 1.0 / this.m.BeingMeleeAttack)))
-					+ "%"
+				text = BeingAttackMeleeText
 			});
 		}
 
 		if(this.m.BeingRangeAttack > 0)
 		{
+			local BeingAttackRangedText ="Being Shot=" + this.m.BeingRangeLanded 
+					+ ", Dodge Rate=" 
+					+ (this.m.BeingRangeAttack == 0 
+						? "-"
+						: this.Math.round(100.0 * (this.m.BeingRangeAttack - this.m.BeingRangeLanded) / this.m.BeingRangeAttack)
+						) + "%";
 			ret.push({
 				id = 24,
 				type = "text",
 				icon = "ui/icons/ranged_defense.png",
-				text = "Being Shot=" + this.m.BeingRangeLanded 
-					+ ", Ranged Dodge=" 
-					+ (this.m.BeingRangeAttack == 0 ? 0 :this.Math.round(100 * (1.0 - this.m.BeingRangeLanded * 1.0 / this.m.BeingRangeAttack)))
-					+ "%"
+				text = BeingAttackRangedText
 			});
 		}
 
@@ -109,11 +132,122 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				icon = "ui/perks/perk_16.png",
 				text = "Executioner=" + this.m.ExecutionerPerkLanded
 					+ ", Effective Rate=" 
-					+ this.Math.round(100 * (this.m.ExecutionerPerkLanded * 1.0 / this.m.ExecutionerPerkAttack)) 
+					+ this.Math.round(100.0 * this.m.ExecutionerPerkLanded  / this.m.ExecutionerPerkAttack) 
 					+ "%"
 			});
 		}
+
+		if(this.m.NineLivesPerkActivated > 0)
+		{
+			local timesText = this.m.NineLivesPerkActivated == 1
+				? "once."
+				: 	(this.m.NineLivesPerkActivated == 2
+						? "twice."
+						: this.m.NineLivesPerkActivated + "times."
+					);
+
+			ret.push({
+				id = 32,
+				type = "text",
+				icon = "ui/perks/perk_07.png",
+				text = "9L save you from dead " + timesText
+			});
+		}
+
+
+		if(this.m.LastDamageDealtHitpoints > 0 || this.m.LastDamageReceiveHitpoints > 0)
+		{
+			local HPDamageText = "(Last)Dealt=" + this.m.LastDamageDealtHitpoints +
+				", Recieved=" + this.m.LastDamageReceiveHitpoints +
+				", Rate=" + (this.m.LastDamageReceiveHitpoints == 0 
+								? this.m.LastDamageDealtHitpoints
+								: this.Math.round(100 * this.m.LastDamageDealtHitpoints / this.m.LastDamageReceiveHitpoints)
+							) + "%";
+			ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png",	text = HPDamageText});
+		}
+
+		if(this.m.LastDamageDealtArmor > 0 || this.m.LastDamageReceiveArmor > 0)
+		{
+			local ArmorDamageText = "(Last)Dealt="  + this.m.LastDamageDealtArmor + 
+				", Recieved=" + this.m.LastDamageReceiveArmor + 
+				", Rate=" + (this.m.LastDamageReceiveArmor == 0 
+								? this.m.LastDamageDealtArmor
+								: this.Math.round(100 * this.m.LastDamageDealtArmor / this.m.LastDamageReceiveArmor)
+							) + "%";
+			ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = ArmorDamageText});
+		}
+
+		if(this.m.LastMeleeAttack > 0 || this.m.LastMeleeLanded > 0)
+		{
+			local MeleeAttackText = "(Last)Attack=" + this.m.LastMeleeAttack +
+				", Landed=" + this.m.LastMeleeLanded  + 
+				", Rate=" + (this.m.LastMeleeAttack == 0 
+								? this.m.LastMeleeLanded
+								: this.Math.round(100.0 * this.m.LastMeleeLanded / this.m.LastMeleeAttack)
+							) + "%";
+			ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
+		}
+
+		if(this.m.LastRangeAttack > 0 || this.m.LastRangeLanded > 0)
+		{
+			local RangedAttackText = "(Last)Attack=" + this.m.LastRangeAttack +
+				", Landed=" + this.m.LastRangeLanded  + 
+				", Rate=" + (this.m.LastRangeAttack == 0 
+								? this.m.LastRangeLanded
+								: this.Math.round(100.0 * this.m.LastRangeLanded / this.m.LastRangeAttack)
+							) + "%";
+			ret.push({ id = 13, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
+		}
+
+		if(this.m.LastBeingMeleeAttack > 0)
+		{
+			local BeingAttackMeleeText = "(Last)Being Hit=" + this.m.LastBeingMeleeLanded 
+					+ ", Dodge Rate=" 
+					+ (this.m.LastBeingMeleeAttack == 0 
+						? "-"
+						: this.Math.round(100.0 * (this.m.LastBeingMeleeAttack - this.m.LastBeingMeleeLanded) / this.m.LastBeingMeleeAttack)
+						) + "%";
+			ret.push({
+				id = 23,
+				type = "text",
+				icon = "ui/icons/shield_damage.png",
+				text = BeingAttackMeleeText
+			});
+		}
+
+		if(this.m.LastBeingRangeAttack > 0)
+		{
+			local BeingAttackRangedText ="(Last)Being Shot=" + this.m.LastBeingRangeLanded 
+					+ ", Dodge Rate=" 
+					+ (this.m.LastBeingRangeAttack == 0 
+						? "-"
+						: this.Math.round(100.0 * (this.m.LastBeingRangeAttack - this.m.LastBeingRangeLanded) / this.m.LastBeingRangeAttack)
+						) + "%";
+			ret.push({
+				id = 24,
+				type = "text",
+				icon = "ui/icons/ranged_defense.png",
+				text = BeingAttackRangedText
+			});
+		}
+
 		return ret;
+	}
+
+	function onCombatStarted()
+	{
+		this.m.LastDamageDealtHitpoints = 0;
+		this.m.LastDamageDealtArmor = 0;
+		this.m.LastMeleeAttack = 0;
+		this.m.LastMeleeLanded = 0;
+		this.m.LastRangeAttack = 0;
+		this.m.LastRangeLanded = 0;
+		this.m.LastDamageReceiveHitpoints = 0;
+		this.m.LastDamageReceiveArmor = 0;
+		this.m.LastBeingMeleeAttack = 0;
+		this.m.LastBeingMeleeLanded = 0;
+		this.m.LastBeingRangeAttack = 0;
+		this.m.LastBeingRangeLanded = 0;
 	}
 
 	function onBeforeTargetHit( _skill, _targetEntity, _hitInfo )
@@ -146,10 +280,13 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				if(item.isItemType(this.Const.Items.ItemType.MeleeWeapon))
 				{
 					this.m.MeleeAttack += 1;
+					this.m.LastMeleeAttack += 1;
+					
 				}
 				if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
 				{
 					this.m.RangeAttack += 1;
+					this.m.LastRangeAttack+= 1;
 				}
 			}
 		}
@@ -159,8 +296,10 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	{
 		if(_skill.m.IsAttack && _skill.m.IsWeaponSkill && !_skill.m.IsOffensiveToolSkill)
 		{
-			this.m.DamageDealtHitpoints = _damageInflictedHitpoints;
-			this.m.DamageDealtArmor = _damageInflictedArmor;
+			this.m.DamageDealtHitpoints += _damageInflictedHitpoints;
+			this.m.DamageDealtArmor 	+= _damageInflictedArmor;
+			this.m.LastDamageDealtHitpoints += _damageInflictedHitpoints;
+			this.m.LastDamageDealtArmor 	+= _damageInflictedArmor;
 
 			local actor = this.getContainer().getActor();
 			local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
@@ -170,11 +309,17 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				{
 					this.m.MeleeAttack += 1;
 					this.m.MeleeLanded += 1;
+
+					this.m.LastMeleeAttack += 1;
+					this.m.LastMeleeLanded += 1;
 				}
 				if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
 				{
 					this.m.RangeAttack += 1;
 					this.m.RangeLanded += 1;
+
+					this.m.LastRangeAttack += 1;
+					this.m.LastRangeLanded += 1;
 				}
 			}
 		}
@@ -182,8 +327,11 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 	function onDamageReceived( _attacker, _damageHitpoints, _damageArmor )
 	{
-		this.m.DamageReceiveHitpoints = _damageHitpoints;
-		this.m.DamageReceiveArmor 	= _damageArmor;
+		this.m.DamageReceiveHitpoints	+= _damageHitpoints;
+		this.m.DamageReceiveArmor 		+= _damageArmor;
+
+		this.m.LastDamageReceiveHitpoints 	+= _damageHitpoints;
+		this.m.LastDamageReceiveArmor 		+= _damageArmor;
 
 		local item = _attacker.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
 		if(item != null)
@@ -192,11 +340,15 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			{
 				this.m.BeingMeleeAttack += 1;
 				this.m.BeingMeleeLanded += 1;
+				this.m.LastBeingMeleeAttack += 1;
+				this.m.LastBeingMeleeLanded += 1;
 			}
 			if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
 			{
 				this.m.BeingRangeAttack += 1;
 				this.m.BeingRangeLanded += 1;
+				this.m.LastBeingRangeAttack += 1;
+				this.m.LastBeingRangeLanded += 1;
 			}
 		}
 	}
@@ -211,12 +363,32 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				if(item.isItemType(this.Const.Items.ItemType.MeleeWeapon))
 				{
 					this.m.BeingMeleeAttack += 1;
+					this.m.BeingMeleeAttack += 1;
 				}
 				if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
 				{
-					this.m.BeingRangeAttack += 1;
+					this.m.LastBeingRangeAttack += 1;
+					this.m.LastBeingRangeAttack += 1;
 				}
 			}
+		}
+	}
+
+	function onTurnEnd()
+	{
+		local perk9L = this.getContainer().getSkillByID("perk.nine_lives");
+		if(perk9L != null && perk9L.isSpent())
+		{
+			this.m.NineLivesPerkActivated +=1 ;
+		}
+	}
+
+	function onTurnStart()
+	{
+		local perk9L = this.getContainer().getSkillByID("perk.nine_lives");
+		if(perk9L != null && perk9L.isSpent())
+		{
+			this.m.NineLivesPerkActivated +=1 ;
 		}
 	}
 
@@ -244,6 +416,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		_out.writeU32(this.m.ExecutionerPerkAttack);
 		_out.writeU32(this.m.ExecutionerPerkLanded);
+		_out.writeU32(this.m.NineLivesPerkActivated);
 	}
 
 	function onDeserialize( _in )
@@ -270,6 +443,9 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 			this.m.ExecutionerPerkAttack  = _in.readU32();
 			this.m.ExecutionerPerkLanded  = _in.readU32();
+
+			this.m.NineLivesPerkActivated  = _in.readU32();
+			
 		}
 	}
 });
