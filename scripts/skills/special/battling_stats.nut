@@ -336,22 +336,25 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.m.LastDamageReceiveHitpoints 	+= _damageHitpoints;
 		this.m.LastDamageReceiveArmor 		+= _damageArmor;
 
-		local item = _attacker.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
-		if(item != null)
+		if(_attacker != null && _attacker.getFaction() != this.getContainer().getActor().getFaction())
 		{
-			if(item.isItemType(this.Const.Items.ItemType.MeleeWeapon))
+			local item = _attacker.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
+			if(item != null)
 			{
-				this.m.BeingMeleeAttack += 1;
-				this.m.BeingMeleeLanded += 1;
-				this.m.LastBeingMeleeAttack += 1;
-				this.m.LastBeingMeleeLanded += 1;
-			}
-			if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
-			{
-				this.m.BeingRangeAttack += 1;
-				this.m.BeingRangeLanded += 1;
-				this.m.LastBeingRangeAttack += 1;
-				this.m.LastBeingRangeLanded += 1;
+				if(item.isItemType(this.Const.Items.ItemType.MeleeWeapon))
+				{
+					this.m.BeingMeleeAttack += 1;
+					this.m.BeingMeleeLanded += 1;
+					this.m.LastBeingMeleeAttack += 1;
+					this.m.LastBeingMeleeLanded += 1;
+				}
+				if(item.isItemType(this.Const.Items.ItemType.RangedWeapon))
+				{
+					this.m.BeingRangeAttack += 1;
+					this.m.BeingRangeLanded += 1;
+					this.m.LastBeingRangeAttack += 1;
+					this.m.LastBeingRangeLanded += 1;
+				}
 			}
 		}
 	}
