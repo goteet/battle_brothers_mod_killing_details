@@ -1,40 +1,53 @@
 this.battling_stats <- this.inherit("scripts/skills/skill", {
 	m = 
 	{
-		DamageDealtHitpoints = 0,
+		DamageDealtHeadHP = 0,
+		DamageDealtBodyHP = 0,
+		DamageDealtHelmet = 0,
 		DamageDealtArmor = 0,
 		MeleeAttack = 0,
 		MeleeLanded = 0,
 		RangeAttack = 0,
 		RangeLanded = 0,
+		HeadblowLanded = 0,
 
-		DamageReceiveHitpoints = 0,
+		DamageReceiveHeadHP = 0,
+		DamageReceiveBodyHP = 0,
+		DamageReceiveHelmet = 0,
 		DamageReceiveArmor = 0,
 		BeingMeleeAttack = 0,
 		BeingMeleeLanded = 0,
 		BeingRangeAttack = 0,
 		BeingRangeLanded = 0,
+		BeingHeadblowed = 0,
 
 		ExecutionerPerkAttack = 0,
 		ExecutionerPerkLanded = 0,
 
 		NineLivesPerkActivated = 0,
 
-		LastDamageDealtHitpoints = 0,
+		LastDamageDealtBodyHP = 0,
+		LastDamageDealtHeadHP = 0,
+		LastDamageDealtHelmet = 0,
 		LastDamageDealtArmor = 0,
 		LastMeleeAttack = 0,
 		LastMeleeLanded = 0,
 		LastRangeAttack = 0,
 		LastRangeLanded = 0,
+		LastHeadblowLanded = 0,
 
-		LastDamageReceiveHitpoints = 0,
+		LastDamageReceiveHeadHP = 0,
+		LastDamageReceiveBodyHP = 0,
+		LastDamageReceiveHelmet = 0,
 		LastDamageReceiveArmor = 0,
 		LastBeingMeleeAttack = 0,
 		LastBeingMeleeLanded = 0,
 		LastBeingRangeAttack = 0,
 		LastBeingRangeLanded = 0,
+		LastBeingHeadblowed = 0,
 
-		NineLivesPerkActivatedThisBattle = 0
+		NineLivesPerkActivatedThisBattle = 0,
+		ReceiveDamageBodyPartThisSkill = 0,
 	},
 
 
@@ -58,72 +71,138 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				id = 1,
 				type = "title",
 				text = this.getName()
+			},
+
+			{
+				id = 10,
+				type = "text",
+				text = "Lifetime Stats:"
 			}
 		];
 
-		local HPDamageText = "Dealt=" + this.m.DamageDealtHitpoints +
-			", Recieved=" + this.m.DamageReceiveHitpoints +
-			", Rate=" + (this.m.DamageReceiveHitpoints == 0 
-							? this.m.DamageDealtHitpoints
-							: this.Math.round(100 * this.m.DamageDealtHitpoints / this.m.DamageReceiveHitpoints)
-						) + "%";
+		if(this.m.DamageDealtHeadHP > 0 || this.m.DamageDealtBodyHP > 0)
+		{
+			local totalDamage = this.m.DamageDealtHeadHP + this.m.DamageDealtBodyHP;
+			local headRatio = this.m.DamageDealtBodyHP == 0 
+				? this.m.DamageDealtHeadHP
+				: this.Math.round(100.0 * this.m.DamageDealtHeadHP / totalDamage);
 
-		local ArmorDamageText = "Dealt="  + this.m.DamageDealtArmor + 
-			", Recieved=" + this.m.DamageReceiveArmor + 
-			", Rate=" + (this.m.DamageReceiveArmor == 0 
-							? this.m.DamageDealtArmor
-							: this.Math.round(100 * this.m.DamageDealtArmor / this.m.DamageReceiveArmor)
-						) + "%";
-				
-		local MeleeAttackText = "Attack=" + this.m.MeleeAttack +
-			", Landed=" + this.m.MeleeLanded  + 
-			", Rate=" + (this.m.MeleeAttack == 0 
-							? this.m.MeleeLanded
-							: this.Math.round(100.0 * this.m.MeleeLanded / this.m.MeleeAttack)
-						) + "%";
+			local HPDamageText = "Dealt=" + totalDamage +
+				", H=" + this.m.DamageDealtHeadHP + 
+				", B=" + this.m.DamageDealtBodyHP + 
+				", HR=" + headRatio + "%";
+			ret.push({ id = 11, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText});
+		}
 
-		local RangedAttackText = "Attack=" + this.m.RangeAttack +
-			", Landed=" + this.m.RangeLanded  + 
-			", Rate=" + (this.m.RangeAttack == 0 
-							? this.m.RangeLanded
-							: this.Math.round(100.0 * this.m.RangeLanded / this.m.RangeAttack)
-						) + "%";
+		if(this.m.DamageDealtHelmet > 0 || this.m.DamageDealtArmor > 0)
+		{
+			local totalDamage = this.m.DamageDealtHelmet + this.m.DamageDealtArmor;
+			local headRatio = this.m.DamageDealtArmor == 0 
+				? this.m.DamageDealtHelmet
+				: this.Math.round(100.0 * this.m.DamageDealtHelmet / totalDamage);
 
-		ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png",	text = HPDamageText});
-		ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = ArmorDamageText});
-		ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
-		ret.push({ id = 13, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
+			local armorDamageText = "Dealt=" + totalDamage +
+				", H=" + this.m.DamageDealtHelmet + 
+				", B=" + this.m.DamageDealtArmor + 
+				", HR=" + headRatio + "%";
+			ret.push({ id = 12, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText});
+		}
+
+		if(this.m.MeleeLanded > 0 || this.m.RangeLanded > 0)
+		{
+			local headRatio = this.Math.round(100.0 * this.m.HeadblowLanded / (this.m.MeleeLanded + this.m.RangeLanded));
+			local headBlowText = "Land=" + this.m.HeadblowLanded +
+				", Ratio=" + headRatio + "%";
+			ret.push({ id = 13, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
+		}
+		
+		if(this.m.MeleeAttack > 0)
+		{
+			local ratio = this.m.MeleeAttack == 0 
+				? this.m.MeleeLanded
+				: this.Math.round(100.0 * this.m.MeleeLanded / this.m.MeleeAttack);
+
+			local meleeAttackText = "Attack=" + this.m.MeleeAttack +
+				", Landed=" + this.m.MeleeLanded  + 
+				", R=" + ratio + "%";
+
+			ret.push({ id = 14, type = "text", icon = "ui/icons/melee_skill.png", text = meleeAttackText});
+		}
+
+		if(this.m.RangeAttack > 0)
+		{
+			local ratio = this.m.RangeAttack == 0 
+				? this.m.RangeLanded
+				: this.Math.round(100.0 * this.m.RangeLanded / this.m.RangeAttack);
+
+			local rangedAttackText = "Attack=" + this.m.RangeAttack +
+				", Landed=" + this.m.RangeLanded  + 
+				", R=" + ratio + "%";
+			ret.push({ id = 15, type = "text", icon = "ui/icons/ranged_skill.png", text = rangedAttackText});
+		}
+
+		if(this.m.DamageReceiveHeadHP > 0 ||  this.m.DamageReceiveBodyHP > 0)
+		{
+			local totalDamage = this.m.DamageReceiveHeadHP + this.m.DamageReceiveBodyHP;
+			local headRatio = this.m.DamageReceiveBodyHP == 0 
+				? this.m.DamageReceiveHeadHP
+				: this.Math.round(100.0 * this.m.DamageReceiveHeadHP / totalDamage);
+
+			local HPDamageText = "Recv=" + totalDamage +
+				", H=" + this.m.DamageReceiveHeadHP + 
+				", B=" + this.m.DamageReceiveBodyHP + 
+				", R=" + headRatio + "%";
+			ret.push({ id = 21, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
+		}
+		
+		if(this.m.DamageReceiveHelmet > 0 || this.m.DamageReceiveArmor > 0)
+		{
+			local totalDamage = this.m.DamageReceiveHelmet + this.m.DamageReceiveArmor;
+			local headRatio = this.m.DamageReceiveArmor == 0 
+				? this.m.DamageReceiveHelmet
+				: this.Math.round(100.0 * this.m.DamageReceiveHelmet / totalDamage);
+
+			local armorDamageText = "Recv=" + totalDamage +
+				", H=" + this.m.DamageReceiveHelmet + 
+				", B=" + this.m.DamageReceiveArmor + 
+				", R=" + headRatio + "%";
+			ret.push({ id = 22, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
+		}
+
+		if(this.m.BeingMeleeLanded > 0 || this.m.BeingRangeLanded > 0)
+		{
+			local headBodyRatio = this.Math.round(100.0 * this.m.BeingHeadblowed / (this.m.BeingMeleeLanded + this.m.BeingRangeLanded));
+			local headBlowText = "Being Blow=" + this.m.BeingHeadblowed + 
+				", Ratio=" + headBodyRatio + "%";
+			ret.push({ id = 23, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
+		}
 
 		if(this.m.BeingMeleeAttack > 0)
 		{
 			local BeingAttackMeleeText = "Being Hit=" + this.m.BeingMeleeLanded 
-					+ ", Dodge Rate=" 
+					+ ", Dodge=" 
 					+ (this.m.BeingMeleeAttack == 0 
 						? "-"
 						: this.Math.round(100.0 * (this.m.BeingMeleeAttack - this.m.BeingMeleeLanded) / this.m.BeingMeleeAttack)
 						) + "%";
-			ret.push({
-				id = 23,
-				type = "text",
-				icon = "ui/icons/shield_damage.png",
-				text = BeingAttackMeleeText
-			});
+			ret.push({ id = 24, type = "text", icon = "ui/icons/shield_damage.png", text = BeingAttackMeleeText });
 		}
 
 		if(this.m.BeingRangeAttack > 0)
 		{
 			local BeingAttackRangedText ="Being Shot=" + this.m.BeingRangeLanded 
-					+ ", Dodge Rate=" 
+					+ ", Dodge=" 
 					+ (this.m.BeingRangeAttack == 0 
 						? "-"
 						: this.Math.round(100.0 * (this.m.BeingRangeAttack - this.m.BeingRangeLanded) / this.m.BeingRangeAttack)
 						) + "%";
-			ret.push({
-				id = 24,
-				type = "text",
-				icon = "ui/icons/ranged_defense.png",
-				text = BeingAttackRangedText
-			});
+			ret.push({ id = 25,	type = "text", icon = "ui/icons/ranged_defense.png", text = BeingAttackRangedText });
+		}
+
+		if(this.m.ExecutionerPerkAttack > 0 
+		|| this.m.NineLivesPerkActivated > 0)
+		{
+			ret.push({ id = 30, type = "text", text = "Perk Stats:" });
 		}
 
 		if(this.m.ExecutionerPerkAttack > 0)
@@ -156,61 +235,122 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			});
 		}
 
-
-		if(this.m.LastDamageDealtHitpoints > 0 || this.m.LastDamageReceiveHitpoints > 0)
+		if(this.m.LastDamageDealtBodyHP > 0 || this.m.LastDamageDealtHeadHP > 0
+		|| this.m.LastDamageDealtHelmet > 0 || this.m.LastDamageDealtArmor > 0
+		|| this.m.LastHeadblowLanded > 0 
+		|| this.m.LastMeleeAttack > 0 || this.m.LastMeleeLanded > 0
+		|| this.m.LastRangeAttack > 0 || this.m.LastRangeLanded > 0
+		|| this.m.LastDamageReceiveHeadHP > 0 ||  this.m.LastDamageReceiveBodyHP > 0
+		|| this.m.LastDamageReceiveHelmet > 0 || this.m.LastDamageReceiveArmor > 0
+		|| this.m.LastBeingHeadblowed > 0
+		|| this.m.LastBeingMeleeAttack > 0 || this.m.LastBeingRangeAttack > 0)
 		{
-			local HPDamageText = "(Last)Dealt=" + this.m.LastDamageDealtHitpoints +
-				", Recieved=" + this.m.LastDamageReceiveHitpoints +
-				", Rate=" + (this.m.LastDamageReceiveHitpoints == 0 
-								? this.m.LastDamageDealtHitpoints
-								: this.Math.round(100 * this.m.LastDamageDealtHitpoints / this.m.LastDamageReceiveHitpoints)
-							) + "%";
-			ret.push({ id = 10, type = "text", icon = "ui/icons/regular_damage.png",	text = HPDamageText});
+			ret.push({ id = 40, type = "text", text = "Last Battle Stats:" });
+		}
+		if(this.m.LastDamageDealtBodyHP > 0 || this.m.LastDamageDealtHeadHP > 0)
+		{
+			local totalDamage = this.m.LastDamageDealtHeadHP + this.m.LastDamageDealtBodyHP;
+			local headRatio = this.m.LastDamageDealtBodyHP == 0 
+				? this.m.LastDamageDealtHeadHP
+				: this.Math.round(100.0 * this.m.LastDamageDealtHeadHP / totalDamage);
+
+			local HPDamageText = "(L)Dealt=" + totalDamage +
+				", H=" + this.m.LastDamageDealtHeadHP + 
+				", B=" + this.m.LastDamageDealtBodyHP + 
+				", R=" + headRatio + "%";
+			ret.push({ id = 41, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
 		}
 
-		if(this.m.LastDamageDealtArmor > 0 || this.m.LastDamageReceiveArmor > 0)
+		if(this.m.LastDamageDealtHelmet > 0 || this.m.LastDamageDealtArmor > 0)
 		{
-			local ArmorDamageText = "(Last)Dealt="  + this.m.LastDamageDealtArmor + 
-				", Recieved=" + this.m.LastDamageReceiveArmor + 
-				", Rate=" + (this.m.LastDamageReceiveArmor == 0 
-								? this.m.LastDamageDealtArmor
-								: this.Math.round(100 * this.m.LastDamageDealtArmor / this.m.LastDamageReceiveArmor)
-							) + "%";
-			ret.push({ id = 11, type = "text", icon = "ui/icons/armor_damage.png", 		text = ArmorDamageText});
+			local totalDamage = this.m.LastDamageDealtHelmet + this.m.LastDamageDealtArmor;
+			local headRatio = this.m.LastDamageDealtArmor == 0 
+				? this.m.LastDamageDealtHelmet
+				: this.Math.round(100.0 * this.m.LastDamageDealtHelmet / totalDamage);
+
+			local armorDamageText = "(L)Dealt=" + totalDamage +
+				", H=" + this.m.LastDamageDealtHelmet + 
+				", B=" + this.m.LastDamageDealtArmor + 
+				", R=" + headRatio + "%";
+			ret.push({ id = 42, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
+		}
+
+		if(this.m.LastHeadblowLanded > 0)
+		{
+			local headRatioLast = this.Math.round(100.0 * this.m.LastHeadblowLanded / (this.m.LastMeleeLanded + this.m.LastRangeLanded));
+			local headBlowText = "(L)Blow=" + this.m.LastHeadblowLanded +
+				", Ratio=" + headRatioLast + "%";
+			ret.push({ id = 43, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
 
 		if(this.m.LastMeleeAttack > 0 || this.m.LastMeleeLanded > 0)
 		{
-			local MeleeAttackText = "(Last)Attack=" + this.m.LastMeleeAttack +
+			local MeleeAttackText = "(L)Attack=" + this.m.LastMeleeAttack +
 				", Landed=" + this.m.LastMeleeLanded  + 
 				", Rate=" + (this.m.LastMeleeAttack == 0 
 								? this.m.LastMeleeLanded
 								: this.Math.round(100.0 * this.m.LastMeleeLanded / this.m.LastMeleeAttack)
 							) + "%";
-			ret.push({ id = 12, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
+			ret.push({ id = 44, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
 		}
 
 		if(this.m.LastRangeAttack > 0 || this.m.LastRangeLanded > 0)
 		{
-			local RangedAttackText = "(Last)Attack=" + this.m.LastRangeAttack +
+			local RangedAttackText = "(L)Attack=" + this.m.LastRangeAttack +
 				", Landed=" + this.m.LastRangeLanded  + 
 				", Rate=" + (this.m.LastRangeAttack == 0 
 								? this.m.LastRangeLanded
 								: this.Math.round(100.0 * this.m.LastRangeLanded / this.m.LastRangeAttack)
 							) + "%";
-			ret.push({ id = 13, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
+			ret.push({ id = 45, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
+		}
+		
+		if(this.m.LastDamageReceiveHeadHP > 0 ||  this.m.LastDamageReceiveBodyHP > 0)
+		{
+			local totalDamage = this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP;
+			local headRatio = this.m.LastDamageReceiveBodyHP == 0 
+				? this.m.LastDamageReceiveHeadHP
+				: this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / totalDamage);
+
+			local HPDamageText = "(L)Recv=" + totalDamage +
+				", H=" + this.m.LastDamageReceiveHeadHP + 
+				", B=" + this.m.LastDamageReceiveBodyHP + 
+				", HR=" + headRatio + "%";
+			ret.push({ id = 46, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
 		}
 
+		if(this.m.LastDamageReceiveHelmet > 0 || this.m.LastDamageReceiveArmor > 0)
+		{
+			local totalDamage = this.m.LastDamageReceiveHelmet + this.m.LastDamageReceiveArmor;
+			local headRatio = this.m.LastDamageReceiveArmor == 0 
+				? this.m.LastDamageReceiveHelmet
+				: this.Math.round(100 * this.m.LastDamageReceiveHelmet / totalDamage);
+
+			local armorDamageText = "(L)Recv=" + totalDamage +
+				", H=" + this.m.LastDamageReceiveHelmet + 
+				", B=" + this.m.LastDamageReceiveArmor + 
+				", HR=" + headRatio + "%";
+			ret.push({ id = 47, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
+		}
+
+		if(this.m.LastBeingHeadblowed > 0)
+		{
+			local headRatio = this.Math.round(100.0 * this.m.LastBeingHeadblowed / (this.m.LastBeingMeleeLanded + this.m.LastBeingRangeLanded));
+			local headBlowText = "(L)Being Blow=" + this.m.LastBeingHeadblowed + 
+				", Ratio=" + headRatio + "%";
+			ret.push({ id = 48, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
+		}
+		
 		if(this.m.LastBeingMeleeAttack > 0)
 		{
-			local BeingAttackMeleeText = "(Last)Being Hit=" + this.m.LastBeingMeleeLanded 
-					+ ", Dodge Rate=" 
+			local BeingAttackMeleeText = "(L)Being Hit=" + this.m.LastBeingMeleeLanded 
+					+ ", Dodge=" 
 					+ (this.m.LastBeingMeleeAttack == 0 
 						? "-"
 						: this.Math.round(100.0 * (this.m.LastBeingMeleeAttack - this.m.LastBeingMeleeLanded) / this.m.LastBeingMeleeAttack)
 						) + "%";
 			ret.push({
-				id = 23,
+				id = 49,
 				type = "text",
 				icon = "ui/icons/shield_damage.png",
 				text = BeingAttackMeleeText
@@ -219,14 +359,14 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		if(this.m.LastBeingRangeAttack > 0)
 		{
-			local BeingAttackRangedText ="(Last)Being Shot=" + this.m.LastBeingRangeLanded 
-					+ ", Dodge Rate=" 
+			local BeingAttackRangedText ="(L)Being Shot=" + this.m.LastBeingRangeLanded 
+					+ ", Dodge=" 
 					+ (this.m.LastBeingRangeAttack == 0 
 						? "-"
 						: this.Math.round(100.0 * (this.m.LastBeingRangeAttack - this.m.LastBeingRangeLanded) / this.m.LastBeingRangeAttack)
 						) + "%";
 			ret.push({
-				id = 24,
+				id = 50,
 				type = "text",
 				icon = "ui/icons/ranged_defense.png",
 				text = BeingAttackRangedText
@@ -238,18 +378,22 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 	function onCombatStarted()
 	{
-		this.m.LastDamageDealtHitpoints = 0;
+		this.m.LastDamageDealtBodyHP = 0;
 		this.m.LastDamageDealtArmor = 0;
 		this.m.LastMeleeAttack = 0;
 		this.m.LastMeleeLanded = 0;
 		this.m.LastRangeAttack = 0;
 		this.m.LastRangeLanded = 0;
-		this.m.LastDamageReceiveHitpoints = 0;
+		this.m.LastHeadblowLanded = 0;
+
+		this.m.LastDamageReceiveBodyHP = 0;
 		this.m.LastDamageReceiveArmor = 0;
 		this.m.LastBeingMeleeAttack = 0;
 		this.m.LastBeingMeleeLanded = 0;
 		this.m.LastBeingRangeAttack = 0;
 		this.m.LastBeingRangeLanded = 0;
+		this.m.LastBeingHeadblowed = 0;
+
 		this.m.NineLivesPerkActivatedThisBattle = 0;
 	}
 
@@ -299,11 +443,6 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	{
 		if(_skill.m.IsAttack && _skill.m.IsWeaponSkill && !_skill.m.IsOffensiveToolSkill)
 		{
-			this.m.DamageDealtHitpoints += _damageInflictedHitpoints;
-			this.m.DamageDealtArmor 	+= _damageInflictedArmor;
-			this.m.LastDamageDealtHitpoints += _damageInflictedHitpoints;
-			this.m.LastDamageDealtArmor 	+= _damageInflictedArmor;
-
 			local actor = this.getContainer().getActor();
 			local item = actor.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
 			if(item != null)
@@ -325,17 +464,42 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 					this.m.LastRangeLanded += 1;
 				}
 			}
+
+			if(_bodyPart == this.Const.BodyPart.Head)
+			{
+				this.m.HeadblowLanded		+= 1;
+				this.m.LastHeadblowLanded  	+= 1;
+
+				this.m.DamageDealtHeadHP 		+= _damageInflictedHitpoints;
+				this.m.DamageDealtHelmet		+= _damageInflictedArmor;
+				this.m.LastDamageDealtHeadHP 	+= _damageInflictedHitpoints;
+				this.m.LastDamageDealtHelmet 	+= _damageInflictedArmor;
+			}
+			else
+			{
+				this.m.DamageDealtBodyHP 		+= _damageInflictedHitpoints;
+				this.m.DamageDealtArmor 		+= _damageInflictedArmor;
+				this.m.LastDamageDealtBodyHP 	+= _damageInflictedHitpoints;
+				this.m.LastDamageDealtArmor 	+= _damageInflictedArmor;
+			}
 		}
+	}
+
+	function onBeforeDamageReceived( _attacker, _skill, _hitInfo, _properties )
+	{
+		if(_attacker != null && _attacker.getFaction() != this.getContainer().getActor().getFaction())
+		{
+			if (_hitInfo.BodyPart == this.Const.BodyPart.Head)
+			{
+				this.m.BeingHeadblowed		+= 1;
+				this.m.LastBeingHeadblowed	+= 1;
+			}
+		}
+		this.m.ReceiveDamageBodyPartThisSkill = _hitInfo.BodyPart;
 	}
 
 	function onDamageReceived( _attacker, _damageHitpoints, _damageArmor )
 	{
-		this.m.DamageReceiveHitpoints	+= _damageHitpoints;
-		this.m.DamageReceiveArmor 		+= _damageArmor;
-
-		this.m.LastDamageReceiveHitpoints 	+= _damageHitpoints;
-		this.m.LastDamageReceiveArmor 		+= _damageArmor;
-
 		if(_attacker != null && _attacker.getFaction() != this.getContainer().getActor().getFaction())
 		{
 			local item = _attacker.getItems().getItemAtSlot(this.Const.ItemSlot.Mainhand);
@@ -355,6 +519,30 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 					this.m.LastBeingRangeAttack += 1;
 					this.m.LastBeingRangeLanded += 1;
 				}
+			}
+			else
+			{
+				this.m.BeingMeleeAttack += 1;
+				this.m.BeingMeleeLanded += 1;
+				this.m.LastBeingMeleeAttack += 1;
+				this.m.LastBeingMeleeLanded += 1;
+			}
+
+			if(this.m.ReceiveDamageBodyPartThisSkill == this.Const.BodyPart.Head)
+			{
+				this.m.DamageReceiveHeadHP	+= _damageHitpoints;
+				this.m.DamageReceiveHelmet 	+= _damageArmor;
+
+				this.m.LastDamageReceiveHeadHP 	+= _damageHitpoints;
+				this.m.LastDamageReceiveHelmet 	+= _damageArmor;
+			}
+			else
+			{
+				this.m.DamageReceiveBodyHP	+= _damageHitpoints;
+				this.m.DamageReceiveArmor 	+= _damageArmor;
+
+				this.m.LastDamageReceiveBodyHP 	+= _damageHitpoints;
+				this.m.LastDamageReceiveArmor 	+= _damageArmor;
 			}
 		}
 	}
@@ -404,26 +592,33 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	function onSerialize( _out )
 	{
 		this.skill.onSerialize(_out);
-
-		local Version = 1;
+		
+		local Version = 2;
 		_out.writeU32(Version);
 
-		_out.writeU32(this.m.DamageDealtHitpoints);
+		_out.writeU32(this.m.DamageDealtHeadHP);
+		_out.writeU32(this.m.DamageDealtBodyHP);
+		_out.writeU32(this.m.DamageDealtHelmet);
 		_out.writeU32(this.m.DamageDealtArmor);
 		_out.writeU32(this.m.MeleeAttack);
 		_out.writeU32(this.m.MeleeLanded);
 		_out.writeU32(this.m.RangeAttack);
 		_out.writeU32(this.m.RangeLanded);
+		_out.writeU32(this.m.HeadblowLanded);
 
-		_out.writeU32(this.m.DamageReceiveHitpoints);
+		_out.writeU32(this.m.DamageReceiveHeadHP);
+		_out.writeU32(this.m.DamageReceiveBodyHP);
+		_out.writeU32(this.m.DamageReceiveHelmet);
 		_out.writeU32(this.m.DamageReceiveArmor);
 		_out.writeU32(this.m.BeingMeleeAttack);
 		_out.writeU32(this.m.BeingMeleeLanded);
 		_out.writeU32(this.m.BeingRangeAttack);
 		_out.writeU32(this.m.BeingRangeLanded);
+		_out.writeU32(this.m.BeingHeadblowed);
 
 		_out.writeU32(this.m.ExecutionerPerkAttack);
 		_out.writeU32(this.m.ExecutionerPerkLanded);
+
 		_out.writeU32(this.m.NineLivesPerkActivated);
 	}
 
@@ -432,18 +627,45 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.skill.onDeserialize(_in);
 
 		local Version = _in.readU32();
-
-		if(Version == 1)
+		if(Version >=2)
 		{
-			this.m.DamageDealtHitpoints	= _in.readU32();
+			this.m.DamageDealtHeadHP = _in.readU32();
+			this.m.DamageDealtBodyHP = _in.readU32();
+			this.m.DamageDealtHelmet = _in.readU32();
+			this.m.DamageDealtArmor = _in.readU32();
+			this.m.MeleeAttack = _in.readU32();
+			this.m.MeleeLanded = _in.readU32();
+			this.m.RangeAttack = _in.readU32();
+			this.m.RangeLanded = _in.readU32();
+			this.m.HeadblowLanded = _in.readU32();
+
+			this.m.DamageReceiveHeadHP = _in.readU32();
+			this.m.DamageReceiveBodyHP = _in.readU32();
+			this.m.DamageReceiveHelmet = _in.readU32();
+			this.m.DamageReceiveArmor = _in.readU32();
+			this.m.BeingMeleeAttack = _in.readU32();
+			this.m.BeingMeleeLanded = _in.readU32();
+			this.m.BeingRangeAttack = _in.readU32();
+			this.m.BeingRangeLanded = _in.readU32();
+			this.m.BeingHeadblowed = _in.readU32();
+
+			this.m.ExecutionerPerkAttack = _in.readU32();
+			this.m.ExecutionerPerkLanded = _in.readU32();
+
+			this.m.NineLivesPerkActivated = _in.readU32();
+
+		}
+		else if(Version >=1 && Version < 2)
+		{
+			this.m.DamageDealtBodyHP	= _in.readU32();
 			this.m.DamageDealtArmor 	= _in.readU32();
 			this.m.MeleeAttack 	= _in.readU32();
 			this.m.MeleeLanded 	= _in.readU32();
 			this.m.RangeAttack 	= _in.readU32();
 			this.m.RangeLanded 	= _in.readU32();
 			
-			this.m.DamageReceiveHitpoints	= _in.readU32();
-			this.m.DamageReceiveArmor 		= _in.readU32();
+			this.m.DamageReceiveBodyHP	= _in.readU32();
+			this.m.DamageReceiveArmor 	= _in.readU32();
 			this.m.BeingMeleeAttack	= _in.readU32();
 			this.m.BeingMeleeLanded	= _in.readU32();
 			this.m.BeingRangeAttack	= _in.readU32();
@@ -452,8 +674,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			this.m.ExecutionerPerkAttack  = _in.readU32();
 			this.m.ExecutionerPerkLanded  = _in.readU32();
 
-			this.m.NineLivesPerkActivated  = _in.readU32();
-			
+			this.m.NineLivesPerkActivated  = _in.readU32();	
 		}
 	}
 });
