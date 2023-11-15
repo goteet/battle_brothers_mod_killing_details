@@ -150,28 +150,28 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			ret.push({ id = 22, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
 		}
 
-		if(this.m.BeingMeleeAttack > 0)
-		{
-			local BeingAttackText = "Being Hit=" + this.m.BeingMeleeLanded 
-					+ ", Dodge=" 
-					+ (this.m.BeingMeleeAttack == 0 
-						? "-"
-						: this.Math.round(100.0 * (this.m.BeingMeleeAttack - this.m.BeingMeleeLanded) / this.m.BeingMeleeAttack)
-						) + "%";
-			ret.push({ id = 24, type = "text", icon = "ui/icons/shield_damage.png", text = BeingAttackText });
-		}
 
-		if(this.m.BeingRangeAttack > 0)
+		if(this.m.BeingMeleeAttack > 0 || this.m.BeingRangeAttack > 0)
 		{
-			local BeingAttackRangedText ="Being Shot=" + this.m.BeingRangeLanded 
-					+ ", Dodge=" 
-					+ (this.m.BeingRangeAttack == 0 
-						? "-"
-						: this.Math.round(100.0 * (this.m.BeingRangeAttack - this.m.BeingRangeLanded) / this.m.BeingRangeAttack)
-						) + "%";
-			ret.push({ id = 25,	type = "text", icon = "ui/icons/ranged_defense.png", text = BeingAttackRangedText });
-		}
+			local dodgeRatio = 100 - this.Math.round(100.0 * (this.m.BeingRangeLanded + this.m.BeingMeleeLanded) / (this.m.BeingRangeAttack + this.m.BeingMeleeAttack));
+			local BeingAttackText = "(L)Being";
+			if(this.m.BeingMeleeAttack > 0 )
+			{
+				BeingAttackText += " Hit=" + this.m.BeingMeleeLanded;
+			}
+			if(this.m.BeingRangeAttack > 0)
+			{
+				if(this.m.BeingMeleeAttack > 0)
+				{
+					BeingAttackText += ",";
+				}
+				BeingAttackText += " Shot=" + this.m.BeingRangeLanded;
+			}
+			BeingAttackText += ", Dodge=" + dodgeRatio + "%";
 
+			ret.push({ id = 49, type = "text", icon = "ui/icons/shield_damage.png", text = BeingAttackText });
+		}
+		
 		if(this.m.BeingMeleeLanded > 0 || this.m.BeingRangeLanded > 0)
 		{
 			local headBodyRatio = this.Math.round(100.0 * this.m.BeingHeadblowLanded / (this.m.BeingMeleeLanded + this.m.BeingRangeLanded));
@@ -309,7 +309,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			{
 				if(this.m.LastBeingMeleeAttack > 0)
 				{
-					BeingAttackText += ","	
+					BeingAttackText += ",";
 				}
 				BeingAttackText += " Shot=" + this.m.LastBeingRangeLanded;
 			}
@@ -323,7 +323,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			local headRatio		= this.Math.round(100.0 * this.m.LastBeingHeadblowLanded / (this.m.LastBeingMeleeLanded + this.m.LastBeingRangeLanded));
 			local damageRatio	= this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / (this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP));
 			local headBlowText = "(L)Being Blow=" + this.m.LastBeingHeadblowLanded + 
-				", Dmg=" + damageRatio + "%"
+				", Dmg=" + damageRatio + "%" + 
 				", Hit=" + headRatio + "%";
 
 			ret.push({ id = 48, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
