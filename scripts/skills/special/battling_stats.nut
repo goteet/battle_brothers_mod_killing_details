@@ -1,4 +1,5 @@
 this.battling_stats <- this.inherit("scripts/skills/skill", {
+	SavingVersion = 4,
 	m = 
 	{
 		DamageDealtHeadHP = 0,
@@ -89,14 +90,6 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 			ret.push({ id = 11, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText});
 		}
 
-		if(this.m.DamageDealtHelmet > 0 || this.m.DamageDealtArmor > 0)
-		{
-			local totalDamage = this.m.DamageDealtHelmet + this.m.DamageDealtArmor;
-			local armorDamageText = "Dealt=H" + this.m.DamageDealtHelmet + 
-				" + B" + this.m.DamageDealtArmor + 
-				"=" + totalDamage;
-			ret.push({ id = 12, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText});
-		}
 		if(this.m.MeleeAttack > 0)
 		{
 			local ratio = this.m.MeleeAttack == 0 
@@ -131,26 +124,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				", Hit=" + headRatio + "%";
 			ret.push({ id = 13, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
-
-		if(this.m.DamageReceiveHeadHP > 0 ||  this.m.DamageReceiveBodyHP > 0)
-		{
-			local totalDamage = this.m.DamageReceiveHeadHP + this.m.DamageReceiveBodyHP;
-			local HPDamageText = "Recv=H" + this.m.DamageReceiveHeadHP + 
-				" + B" + this.m.DamageReceiveBodyHP + 
-				"=" + totalDamage;
-			ret.push({ id = 21, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
-		}
 		
-		if(this.m.DamageReceiveHelmet > 0 || this.m.DamageReceiveArmor > 0)
-		{
-			local totalDamage = this.m.DamageReceiveHelmet + this.m.DamageReceiveArmor;
-			local armorDamageText = "Recv=H" + this.m.DamageReceiveHelmet + 
-				" + B=" + this.m.DamageReceiveArmor + 
-				"=" + totalDamage;
-			ret.push({ id = 22, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
-		}
-
-
 		if(this.m.BeingMeleeAttack > 0 || this.m.BeingRangeAttack > 0)
 		{
 			local dodgeRatio = 100 - this.Math.round(100.0 * (this.m.BeingRangeLanded + this.m.BeingMeleeLanded) / (this.m.BeingRangeAttack + this.m.BeingMeleeAttack));
@@ -570,9 +544,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	function onSerialize( _out )
 	{
 		this.skill.onSerialize(_out);
-		
-		local Version = 3;
-		_out.writeU32(Version);
+		_out.writeU32(this.SavingVersion);
 
 		_out.writeU32(this.m.DamageDealtHeadHP);
 		_out.writeU32(this.m.DamageDealtBodyHP);
@@ -598,6 +570,26 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		_out.writeU32(this.m.ExecutionerPerkLanded);
 
 		_out.writeU32(this.m.NineLivesPerkActivated);
+
+		_out.writeU32(LastDamageDealtBodyHP);
+		_out.writeU32(LastDamageDealtHeadHP);
+		_out.writeU32(LastDamageDealtHelmet);
+		_out.writeU32(LastDamageDealtArmor);
+		_out.writeU32(LastMeleeAttack);
+		_out.writeU32(LastMeleeLanded);
+		_out.writeU32(LastRangeAttack);
+		_out.writeU32(LastRangeLanded);
+		_out.writeU32(LastHeadblowLanded);
+
+		_out.writeU32(LastDamageReceiveHeadHP);
+		_out.writeU32(LastDamageReceiveBodyHP);
+		_out.writeU32(LastDamageReceiveHelmet);
+		_out.writeU32(LastDamageReceiveArmor);
+		_out.writeU32(LastBeingMeleeAttack);
+		_out.writeU32(LastBeingMeleeLanded);
+		_out.writeU32(LastBeingRangeAttack);
+		_out.writeU32(LastBeingRangeLanded);
+		_out.writeU32(LastBeingHeadblowLanded);
 	}
 
 	function onDeserialize( _in )
@@ -605,7 +597,54 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.skill.onDeserialize(_in);
 
 		local Version = _in.readU32();
-		if(Version >=2)
+		if(Version >= 4)
+		{
+			
+			this.m.DamageDealtHeadHP = _in.readU32();
+			this.m.DamageDealtBodyHP = _in.readU32();
+			this.m.DamageDealtHelmet = _in.readU32();
+			this.m.DamageDealtArmor = _in.readU32();
+			this.m.MeleeAttack = _in.readU32();
+			this.m.MeleeLanded = _in.readU32();
+			this.m.RangeAttack = _in.readU32();
+			this.m.RangeLanded = _in.readU32();
+			this.m.HeadblowLanded = _in.readU32();
+
+			this.m.DamageReceiveHeadHP = _in.readU32();
+			this.m.DamageReceiveBodyHP = _in.readU32();
+			this.m.DamageReceiveHelmet = _in.readU32();
+			this.m.DamageReceiveArmor = _in.readU32();
+			this.m.BeingMeleeAttack = _in.readU32();
+			this.m.BeingMeleeLanded = _in.readU32();
+			this.m.BeingRangeAttack = _in.readU32();
+			this.m.BeingRangeLanded = _in.readU32();
+			this.m.BeingHeadblowLanded = _in.readU32();
+
+			this.m.ExecutionerPerkAttack = _in.readU32();
+
+			this.m.NineLivesPerkActivated = _in.readU32();
+
+			this.m.LastDamageDealtBodyHP = _in.readU32();
+			this.m.LastDamageDealtHeadHP = _in.readU32();
+			this.m.LastDamageDealtHelmet = _in.readU32();
+			this.m.LastDamageDealtArmor = _in.readU32();
+			this.m.LastMeleeAttack = _in.readU32();
+			this.m.LastMeleeLanded = _in.readU32();
+			this.m.LastRangeAttack = _in.readU32();
+			this.m.LastRangeLanded = _in.readU32();
+			this.m.LastHeadblowLanded = _in.readU32();
+
+			this.m.LastDamageReceiveHeadHP = _in.readU32();
+			this.m.LastDamageReceiveBodyHP = _in.readU32();
+			this.m.LastDamageReceiveHelmet = _in.readU32();
+			this.m.LastDamageReceiveArmor = _in.readU32();
+			this.m.LastBeingMeleeAttack = _in.readU32();
+			this.m.LastBeingMeleeLanded = _in.readU32();
+			this.m.LastBeingRangeAttack = _in.readU32();
+			this.m.LastBeingRangeLanded = _in.readU32();
+			this.m.LastBeingHeadblowLanded = _in.readU32();
+		}
+		if(Version >=2 && Version <= 3)
 		{
 			this.m.DamageDealtHeadHP = _in.readU32();
 			this.m.DamageDealtBodyHP = _in.readU32();
