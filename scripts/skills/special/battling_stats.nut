@@ -308,6 +308,8 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 	function onCombatStarted()
 	{
 		this.m.LastDamageDealtBodyHP = 0;
+		this.m.LastDamageDealtHeadHP = 0;
+		this.m.LastDamageDealtHelmet = 0;
 		this.m.LastDamageDealtArmor = 0;
 		this.m.LastMeleeAttack = 0;
 		this.m.LastMeleeLanded = 0;
@@ -315,7 +317,9 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.m.LastRangeLanded = 0;
 		this.m.LastHeadblowLanded = 0;
 
+		this.m.LastDamageReceiveHeadHP = 0;
 		this.m.LastDamageReceiveBodyHP = 0;
+		this.m.LastDamageReceiveHelmet = 0;
 		this.m.LastDamageReceiveArmor = 0;
 		this.m.LastBeingMeleeAttack = 0;
 		this.m.LastBeingMeleeLanded = 0;
