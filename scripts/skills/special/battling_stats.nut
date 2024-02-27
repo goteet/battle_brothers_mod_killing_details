@@ -56,7 +56,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		this.m.ID = "special.battling_stats";
 		this.m.Name = "Battling Details";
 		this.m.Description = "The Killing Detail Counter";
-		this.m.Icon = "ui/backgrounds/background_20.png";
+		this.m.Icon = "skills/battling_stats.png";
 		this.m.IconMini = "";
 		this.m.Order = this.Const.SkillOrder.Trait + 602;
 		this.m.Type = this.Const.SkillType.Special | this.Const.SkillType.Trait;
@@ -147,8 +147,9 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 		
 		if(this.m.BeingMeleeLanded > 0 || this.m.BeingRangeLanded > 0)
 		{
+			local totalDamage = this.m.DamageReceiveHeadHP + this.m.DamageReceiveBodyHP;
 			local headBodyRatio = this.Math.round(100.0 * this.m.BeingHeadblowLanded / (this.m.BeingMeleeLanded + this.m.BeingRangeLanded));
-			local damageRatio = this.Math.round(100.0 * this.m.DamageReceiveHeadHP / (this.m.DamageReceiveHeadHP + this.m.DamageReceiveBodyHP));
+			local damageRatio = totalDamage > 0 ? this.Math.round(100.0 * this.m.DamageReceiveHeadHP / totalDamage) : 0;
 			local headBlowText = "Being Blow=" + this.m.BeingHeadblowLanded + 
 				", Dmg=" + damageRatio + "%" + 
 				", Hit=" + headBodyRatio + "%";
@@ -293,9 +294,10 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		if(this.m.LastBeingHeadblowLanded > 0)
 		{
+			local totalDamage	= this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP;
 			local headRatio		= this.Math.round(100.0 * this.m.LastBeingHeadblowLanded / (this.m.LastBeingMeleeLanded + this.m.LastBeingRangeLanded));
-			local damageRatio	= this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / (this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP));
-			local headBlowText = "(L)Being Blow=" + this.m.LastBeingHeadblowLanded + 
+			local damageRatio	= totalDamage > 0 ? this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / totalDamage) : 0;
+			local headBlowText	= "(L)Being Blow=" + this.m.LastBeingHeadblowLanded + 
 				", Dmg=" + damageRatio + "%" + 
 				", Hit=" + headRatio + "%";
 
@@ -432,15 +434,6 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 	function onBeforeDamageReceived( _attacker, _skill, _hitInfo, _properties )
 	{
-		if(_attacker != null && _attacker.getFaction() != this.getContainer().getActor().getFaction())
-		{
-			if (_hitInfo.BodyPart == this.Const.BodyPart.Head)
-			{
-				this.m.BeingHeadblowLanded		+= 1;
-				this.m.LastBeingHeadblowLanded	+= 1;
-			}
-		}
-		
 		this.m.ReceiveDamageBodyPartThisSkill = _hitInfo.BodyPart;
 	}
 
@@ -473,8 +466,12 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				this.m.LastBeingMeleeAttack += 1;
 				this.m.LastBeingMeleeLanded += 1;
 			}
+			
 			if(this.m.ReceiveDamageBodyPartThisSkill == this.Const.BodyPart.Head)
 			{
+				this.m.BeingHeadblowLanded		+= 1;
+				this.m.LastBeingHeadblowLanded	+= 1;
+
 				this.m.DamageReceiveHeadHP	+= _damageHitpoints;
 				this.m.DamageReceiveHelmet 	+= _damageArmor;
 
@@ -516,12 +513,6 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				this.m.LastBeingMeleeAttack += 1;
 			}
 		}
-	}
-
-	function onAfterUse(_user, _targetTile)
-	{
-
-			this.logInfo("test test test");
 	}
 	
 	function onTurnEnd()
