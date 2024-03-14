@@ -48,7 +48,7 @@
 				local saved = skill.m.SavedGolds;
 				if(saved > 0)
 				{
-					local saved_golds_desc = "Saved [img]gfx/ui/tooltips/money.png[/img] " + saved + " golds .";
+					local saved_golds_desc = format("Saved [img]gfx/ui/tooltips/money.png[/img]%d golds.", saved);
 					local saved_golds_desc_item = { id = 70, type = "text", icon = "ui/icons/asset_money.png", text = saved_golds_desc };
 					if(daili_cost_index == -1)
 					{
@@ -64,7 +64,7 @@
 				if(weapon_stats.MostUsedWeaponIndex != -1)
 				{
 					local weapon_name = weapon_stats.UsedWeaponRecords[weapon_stats.MostUsedWeaponIndex].Name;
-					local saved_golds_desc_item = { id = 40, type = "description", text = "His favorite weapon is " +  weapon_name + "."};
+					local saved_golds_desc_item = { id = 40, type = "description", text = format("His favorite weapon is %s.", weapon_name)};
 					tooltips.push(saved_golds_desc_item);
 				}
 			}

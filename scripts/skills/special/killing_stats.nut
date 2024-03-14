@@ -830,10 +830,10 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
 		if(index_start < ESpecies.Num)
 		{
-			local description = ", including " 
-						+ this.m.KillingStats.Species[index_start] 
-						+ " " 
-						+ ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)];
+			local description = format(", including %d %s"
+					, this.m.KillingStats.Species[index_start]
+					, ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)]
+			);
 			
 			if(index_start != index_end)
 			{
@@ -841,14 +841,17 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 				{
 					if(this.m.KillingStats.Species[index_start] > 0)
 					{
-						description += ", " + this.m.KillingStats.Species[index_start] + " " 
-									+ ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)];
-										
+						description += format(", %d %s"
+							, this.m.KillingStats.Species[index_start]
+							, ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)]
+						);		
 					}
 				}
 
-				description += " and " + this.m.KillingStats.Species[index_start] + " " 
-							+ ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)];
+				description += format(" and %d %s"
+					, this.m.KillingStats.Species[index_start]
+					, ESpecies.Names[(this.m.KillingStats.Species[index_start] == 1 ? index_start*2 : index_start*2+1)]
+				);
 			}
 
 			description += ".";
@@ -879,10 +882,10 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			if(this.m.KillingStats.SpeciesDetails[index] > 0 )
 			{
-				local text = "[img]gfx/ui/tooltips/orientation/" 
-							+ ESpeciesDetails.Resources[index] 
-							+ "[/img] "
-							+ this.m.KillingStats.SpeciesDetails[index];
+				local text = format("[img]gfx/ui/tooltips/orientation/%s[/img] %d"
+					, ESpeciesDetails.Resources[index]
+					, this.m.KillingStats.SpeciesDetails[index]
+				);
 				species_detail_texts.push(text);
 			}
 		}
@@ -890,10 +893,10 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			if(this.m.KillingStats.Remarkables[remarkable_index] > 0 )
 			{
-				local text = "[img]gfx/ui/tooltips/orientation/" 
-							+ ERemarkable.Resources[remarkable_index]
-							+ "[/img] "
-							+ this.m.KillingStats.Remarkables[remarkable_index];
+				local text = format("[img]gfx/ui/tooltips/orientation/%s[/img] %d"
+					, ERemarkable.Resources[remarkable_index]
+					, this.m.KillingStats.Remarkables[remarkable_index]
+				);
 				remarkable_low_texts.push(text);
 			}
 		}
@@ -901,10 +904,10 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			if(this.m.KillingStats.Remarkables[remarkable_index] > 0 )
 			{
-				local text = "[img]gfx/ui/tooltips/orientation/" 
-							+ ERemarkable.Resources[remarkable_index]
-							+ "[/img] "
-							+ this.m.KillingStats.Remarkables[remarkable_index];
+				local text = format("[img]gfx/ui/tooltips/orientation/%s[/img] %d"
+					, ERemarkable.Resources[remarkable_index]
+					, this.m.KillingStats.Remarkables[remarkable_index]
+				);
 				remarkable_boss_texts.push(text);
 			}
 		}
@@ -912,9 +915,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			if(this.m.KillingStats.Remarkables[remarkable_index] > 0 )
 			{
-				unique_text += "[img]gfx/ui/tooltips/orientation/" 
-							+ ERemarkable.Resources[remarkable_index]
-							+ "[/img]  ";
+				unique_text += format("[img]gfx/ui/tooltips/orientation/%s[/img] ", ERemarkable.Resources[remarkable_index]);
 			}
 		}
 		
@@ -927,11 +928,11 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		local participate_text = "";
 		if(battles > 0)
 		{
-			participate_text = "He participate " + battles + (battles > 1 ? " battles" : " battle");
+			participate_text = format("He participate %d battle%s", battles, (battles > 1 ? "s" : ""));
 						
 			if(time > 1)
 			{
-				participate_text += " in " + time + " days";
+				participate_text += format(" in %d days", time);
 			}
 			else if(time < 1)
 			{
@@ -945,7 +946,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 			if(kill_count > 0)
 			{
 				local single_kill = kill_count == 1;
-				participate_text += " and has " + kill_count + (single_kill ? " kill" : " kills");
+				participate_text += format(" and has %d kill%s", kill_count, (single_kill ? "" : "s"));
 				local has_killing_records = species_detail_texts.len() > 0 || remarkable_low_texts.len() > 0 || remarkable_boss_texts.len() > 0 || unique_text != "";
 				if(has_killing_records)
 				{
@@ -966,7 +967,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 		{
 			if(time > 1)
 			{
-				participate_text = "He joined the company " + time + " days, but has no kills yet.";
+				participate_text = format("He joined the company %d days, but has no kills yet.", time);
 			}
 			else
 			{

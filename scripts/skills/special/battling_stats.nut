@@ -82,10 +82,11 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		if(this.m.DamageDealtHeadHP > 0 || this.m.DamageDealtBodyHP > 0)
 		{
-			local totalDamage = this.m.DamageDealtHeadHP + this.m.DamageDealtBodyHP;
-			local HPDamageText = "Dealt=H" + this.m.DamageDealtHeadHP + 
-				" + B" + this.m.DamageDealtBodyHP + 
-				"=" + totalDamage;
+			local HPDamageText = format("Dealt H %d+B %d=%d HP"
+				, this.m.DamageDealtHeadHP
+				, this.m.DamageDealtBodyHP
+				, this.m.DamageDealtHeadHP + this.m.DamageDealtBodyHP
+			);
 			ret.push({ id = 11, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText});
 		}
 
@@ -95,9 +96,10 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				? this.m.MeleeLanded
 				: this.Math.round(100.0 * this.m.MeleeLanded / this.m.MeleeAttack);
 
-			local meleeAttackText = "Landed=" + this.m.MeleeLanded  + 
-				", Attack=" + this.m.MeleeAttack +
-				", HR=" + ratio + "%";
+			local meleeAttackText = format("Land=%d, Attack=%d, Hit=%d%%"
+				, this.m.MeleeLanded
+				, this.m.MeleeAttack
+				, ratio);
 
 			ret.push({ id = 14, type = "text", icon = "ui/icons/melee_skill.png", text = meleeAttackText});
 		}
@@ -108,51 +110,39 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				? this.m.RangeLanded
 				: this.Math.round(100.0 * this.m.RangeLanded / this.m.RangeAttack);
 
-			local rangedAttackText = "Landed=" + this.m.RangeLanded  + 
-				", Attack=" + this.m.RangeAttack +
-				", HR=" + ratio + "%";
+			local rangedAttackText = format("Land=%d, Shoot=%d, Hit=%d%%"
+				, this.m.RangeLanded
+				, this.m.RangeAttack
+				, ratio);
 			ret.push({ id = 15, type = "text", icon = "ui/icons/ranged_skill.png", text = rangedAttackText});
 		}
 
 		if(this.m.MeleeLanded > 0 || this.m.RangeLanded > 0)
 		{
-			local headRatio = this.Math.round(100.0 * this.m.HeadblowLanded / (this.m.MeleeLanded + this.m.RangeLanded));
-			local damageRatio = this.Math.round(100.0 * this.m.DamageDealtHeadHP / (this.m.DamageDealtHeadHP + this.m.DamageDealtBodyHP));
-			local headBlowText = "Land=" + this.m.HeadblowLanded +
-				", Dmg=" + damageRatio + "%" + 
-				", Hit=" + headRatio + "%";
+			local headBlowText = format("Land=%d, Hit=%d%%, Damage=%d%%"
+				, this.m.HeadblowLanded
+				, this.Math.round(100.0 * this.m.HeadblowLanded / (this.m.MeleeLanded + this.m.RangeLanded))
+				, this.Math.round(100.0 * this.m.DamageDealtHeadHP / (this.m.DamageDealtHeadHP + this.m.DamageDealtBodyHP))
+			);
 			ret.push({ id = 13, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
 		
 		if(this.m.BeingMeleeAttack > 0 || this.m.BeingRangeAttack > 0)
 		{
 			local dodgeRatio = 100 - this.Math.round(100.0 * (this.m.BeingRangeLanded + this.m.BeingMeleeLanded) / (this.m.BeingRangeAttack + this.m.BeingMeleeAttack));
-			local BeingAttackText = "(L)Being";
-			if(this.m.BeingMeleeAttack > 0 )
-			{
-				BeingAttackText += " Hit=" + this.m.BeingMeleeLanded;
-			}
-			if(this.m.BeingRangeAttack > 0)
-			{
-				if(this.m.BeingMeleeAttack > 0)
-				{
-					BeingAttackText += ",";
-				}
-				BeingAttackText += " Shot=" + this.m.BeingRangeLanded;
-			}
-			BeingAttackText += ", Dodge=" + dodgeRatio + "%";
-
-			ret.push({ id = 49, type = "text", icon = "ui/icons/shield_damage.png", text = BeingAttackText });
+			local BeAttackedText = format("Be Hit=%d, Shot=%d, Dodge=%d%%", this.m.BeingMeleeLanded , this.m.BeingRangeLanded, dodgeRatio);
+			ret.push({ id = 49, type = "text", icon = "ui/icons/shield_damage.png", text = BeAttackedText });
 		}
 		
 		if(this.m.BeingMeleeLanded > 0 || this.m.BeingRangeLanded > 0)
 		{
 			local totalDamage = this.m.DamageReceiveHeadHP + this.m.DamageReceiveBodyHP;
-			local headBodyRatio = this.Math.round(100.0 * this.m.BeingHeadblowLanded / (this.m.BeingMeleeLanded + this.m.BeingRangeLanded));
-			local damageRatio = totalDamage > 0 ? this.Math.round(100.0 * this.m.DamageReceiveHeadHP / totalDamage) : 0;
-			local headBlowText = "Being Blow=" + this.m.BeingHeadblowLanded + 
-				", Dmg=" + damageRatio + "%" + 
-				", Hit=" + headBodyRatio + "%";
+			local damageRatio = totalDamage > 0 ? this.Math.round(100.0 * this.m.DamageReceiveHeadHP / totalDamage) : this.m.DamageReceiveHeadHP;
+			local headBlowText = format("Be Blowed=%d, Hit=%d%%, Damage=%d%%"
+				, this.m.BeingHeadblowLanded
+				, this.Math.round(100.0 * this.m.BeingHeadblowLanded / (this.m.BeingMeleeLanded + this.m.BeingRangeLanded))
+				, damageRatio
+			);
 			ret.push({ id = 23, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
 
@@ -169,21 +159,19 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 				id = 31,
 				type = "text",
 				icon = "ui/perks/perk_16.png",
-				text = "Executioner=" + this.m.ExecutionerPerkLanded
-					+ ", Effective Rate=" 
-					+ this.Math.round(100.0 * this.m.ExecutionerPerkLanded  / this.m.ExecutionerPerkAttack) 
-					+ "%"
+				text = format("Effectual=%d(%d%%,%d%%), Trigger=%d(%d%%)"
+					, this.m.ExecutionerPerkLanded
+					, this.Math.round(100.0 * this.m.ExecutionerPerkLanded / this.m.ExecutionerPerkAttack)
+					, this.Math.round(100.0 * this.m.ExecutionerPerkLanded / (this.m.MeleeLanded + this.m.RangeLanded))
+					, this.m.ExecutionerPerkAttack
+					, this.Math.round(100.0 * this.m.ExecutionerPerkAttack / (this.m.MeleeLanded + this.m.RangeLanded))
+				)
 			});
 		}
 
 		if(this.m.NineLivesPerkActivated > 0)
 		{
-			local timesText = this.m.NineLivesPerkActivated == 1
-				? "once."
-				: 	(this.m.NineLivesPerkActivated == 2
-						? "twice."
-						: this.m.NineLivesPerkActivated + " times."
-					);
+			local timesText = this.m.NineLivesPerkActivated == 1 ? "once." : (this.m.NineLivesPerkActivated == 2 ? "twice." : this.m.NineLivesPerkActivated + " times.");
 
 			ret.push({
 				id = 32,
@@ -208,99 +196,86 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
 
 		if(this.m.LastDamageDealtBodyHP > 0 || this.m.LastDamageDealtHeadHP > 0)
 		{
-			local totalDamage = this.m.LastDamageDealtHeadHP + this.m.LastDamageDealtBodyHP;
-			local HPDamageText = "(L)Dealt=H" + this.m.LastDamageDealtHeadHP + 
-				" + B" + this.m.LastDamageDealtBodyHP + 
-				"=" + totalDamage;
+			local HPDamageText = format("Dealt H %d+B %d=%d HP"
+				, this.m.LastDamageDealtHeadHP 
+				, this.m.LastDamageDealtBodyHP 
+				, this.m.LastDamageDealtHeadHP + this.m.LastDamageDealtBodyHP
+			);
 			ret.push({ id = 41, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
 		}
 
 		if(this.m.LastDamageDealtHelmet > 0 || this.m.LastDamageDealtArmor > 0)
 		{
-			local totalDamage = this.m.LastDamageDealtHelmet + this.m.LastDamageDealtArmor;
-			local armorDamageText = "(L)Dealt=H" + this.m.LastDamageDealtHelmet + 
-				" + B" + this.m.LastDamageDealtArmor + 
-				"=" + totalDamage;
+			local armorDamageText = format("Dealt H %d+B %d=%d Armors"
+				, this.m.LastDamageDealtHelmet
+				, this.m.LastDamageDealtArmor
+				, this.m.LastDamageDealtHelmet + this.m.LastDamageDealtArmor
+			);
 			ret.push({ id = 42, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
 		}
 
 		if(this.m.LastMeleeAttack > 0 || this.m.LastMeleeLanded > 0)
 		{
-			local MeleeAttackText = "(L)Landed=" + this.m.LastMeleeLanded +
-				", Attack=" + this.m.LastMeleeAttack  + 
-				", Rate=" + (this.m.LastMeleeAttack == 0 
-								? this.m.LastMeleeLanded
-								: this.Math.round(100.0 * this.m.LastMeleeLanded / this.m.LastMeleeAttack)
-							) + "%";
+			local MeleeAttackText =  format("Land=%d, Attack=%d, Hit=%d%%"
+				, this.m.LastMeleeLanded
+				, this.m.LastMeleeAttack
+				, (this.m.LastMeleeAttack == 0 ? this.m.LastMeleeLanded : this.Math.round(100.0 * this.m.LastMeleeLanded / this.m.LastMeleeAttack))
+			);
 			ret.push({ id = 44, type = "text", icon = "ui/icons/damage_dealt.png",		text = MeleeAttackText});
 		}
 
 		if(this.m.LastRangeAttack > 0 || this.m.LastRangeLanded > 0)
 		{
-			local RangedAttackText = "(L)Land=" + this.m.LastRangeLanded +
-				", Attack=" + this.m.LastRangeAttack  + 
-				", Rate=" + (this.m.LastRangeAttack == 0 
-								? this.m.LastRangeLanded
-								: this.Math.round(100.0 * this.m.LastRangeLanded / this.m.LastRangeAttack)
-							) + "%";
+			local RangedAttackText = format("Land=%d, Shoot=%d, Hit=%d%%"
+				, this.m.LastRangeLanded
+				, this.m.LastRangeAttack
+				, (this.m.LastRangeAttack == 0 ? this.m.LastRangeLanded : this.Math.round(100.0 * this.m.LastRangeLanded / this.m.LastRangeAttack))
+			);
 			ret.push({ id = 45, type = "text", icon = "ui/icons/ranged_skill.png",		text = RangedAttackText});
 		}
 
 		if(this.m.LastHeadblowLanded > 0)
 		{
 			local headRatioLast = this.Math.round(100.0 * this.m.LastHeadblowLanded / (this.m.LastMeleeLanded + this.m.LastRangeLanded));
-			local headBlowText = "(L)Blow=" + this.m.LastHeadblowLanded +
-				", Ratio=" + headRatioLast + "%";
+			local headBlowText = format("Blow=%d, Ratio=%d%%", this.m.LastHeadblowLanded, headRatioLast);
 			ret.push({ id = 43, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
 		
 		if(this.m.LastDamageReceiveHeadHP > 0 ||  this.m.LastDamageReceiveBodyHP > 0)
 		{
-			local totalDamage = this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP;
-			local HPDamageText = "(L)Recv=H" + this.m.LastDamageReceiveHeadHP + 
-				" + B" + this.m.LastDamageReceiveBodyHP + 
-				"=" + totalDamage;
+			local HPDamageText = format("Recv H %d+B %d=%d HP"
+				, this.m.LastDamageReceiveHeadHP 
+				, this.m.LastDamageReceiveBodyHP
+				, this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP
+			);
 			ret.push({ id = 46, type = "text", icon = "ui/icons/regular_damage.png", text = HPDamageText });
 		}
 
 		if(this.m.LastDamageReceiveHelmet > 0 || this.m.LastDamageReceiveArmor > 0)
 		{
-			local totalDamage = this.m.LastDamageReceiveHelmet + this.m.LastDamageReceiveArmor;
-			local armorDamageText = "(L)Recv=H" + this.m.LastDamageReceiveHelmet + 
-				" + B" + this.m.LastDamageReceiveArmor + 
-				"=" + totalDamage;
+			local armorDamageText = format("Recv H %d+B %d=%d Armors"
+				, this.m.LastDamageReceiveHelmet
+				, this.m.LastDamageReceiveArmor
+				, this.m.LastDamageReceiveHelmet + this.m.LastDamageReceiveArmor
+			);
 			ret.push({ id = 47, type = "text", icon = "ui/icons/armor_damage.png",	text = armorDamageText });
 		}
 		if(this.m.LastBeingMeleeAttack > 0 || this.m.LastBeingRangeAttack > 0)
 		{
 			local dodgeRatio = 100 - this.Math.round(100.0 * (this.m.LastBeingRangeLanded + this.m.LastBeingMeleeLanded) / (this.m.LastBeingRangeAttack + this.m.LastBeingMeleeAttack));
-			local BeingAttackText = "(L)Being";
-			if(this.m.LastBeingMeleeAttack > 0 )
-			{
-				BeingAttackText += " Hit=" + this.m.LastBeingMeleeLanded;
-			}
-			if(this.m.LastBeingRangeAttack > 0)
-			{
-				if(this.m.LastBeingMeleeAttack > 0)
-				{
-					BeingAttackText += ",";
-				}
-				BeingAttackText += " Shot=" + this.m.LastBeingRangeLanded;
-			}
-			BeingAttackText += ", Dodge=" + dodgeRatio + "%";
-
+			local BeingAttackText = format("Be Hit=%d, Shot=%d, Dodge=%d%%", this.m.LastBeingMeleeLanded , this.m.LastBeingRangeLanded, dodgeRatio);
 			ret.push({ id = 49, type = "text", icon = "ui/icons/shield_damage.png", text = BeingAttackText });
 		}
 
 		if(this.m.LastBeingHeadblowLanded > 0)
 		{
 			local totalDamage	= this.m.LastDamageReceiveHeadHP + this.m.LastDamageReceiveBodyHP;
-			local headRatio		= this.Math.round(100.0 * this.m.LastBeingHeadblowLanded / (this.m.LastBeingMeleeLanded + this.m.LastBeingRangeLanded));
-			local damageRatio	= totalDamage > 0 ? this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / totalDamage) : 0;
-			local headBlowText	= "(L)Being Blow=" + this.m.LastBeingHeadblowLanded + 
-				", Dmg=" + damageRatio + "%" + 
-				", Hit=" + headRatio + "%";
-
+			local damageRatio	= totalDamage > 0 ? this.Math.round(100.0 * this.m.LastDamageReceiveHeadHP / totalDamage) : this.m.LastDamageReceiveHeadHP;
+			local headBlowText	= format("Be Blowed=%d, Hit=%d%%, Damage=%d%%"
+				, this.m.LastBeingHeadblowLanded
+				, this.Math.round(100.0 * this.m.LastBeingHeadblowLanded / (this.m.LastBeingMeleeLanded + this.m.LastBeingRangeLanded))
+				, damageRatio
+			);
 			ret.push({ id = 48, type = "text", icon = "ui/icons/chance_to_hit_head.png", text = headBlowText });
 		}
 
