@@ -394,7 +394,7 @@ local ERemarkable =
 
 	Start_Unique = 47,
 		BarbarianMadman = 47,
-		SkeleonKing = 48,
+		SkeletonKing = 48,
 		Ijirok = 49,
 		Kraken = 50,
 	End_Unique = 50,
