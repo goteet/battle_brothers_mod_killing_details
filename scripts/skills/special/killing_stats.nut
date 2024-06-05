@@ -735,38 +735,38 @@
             return this.Num;
         }
     },
-    TitleName       = "Killing Details",
+    TitleName       = "杀戮小本本",
     TooltipText = {
-        Including   = "including",
-        And         = " and "
-        Period      = ".",
-        Comma       = ", ",
+        Including   = "包含",
+        And         = "和"
+        Period      = "。",
+        Comma       = "，",
 
         SpeciesNames = [
-            "Human",        "Humen",
-            "Greenskin",    "Greenskins",
-            "Undead",       "Undead things",
-            "Beast",        "Beasts",
-            "Witch",        "Witches"
+            "个人类",   "个人类",
+            "只绿皮",   "只绿皮",
+            "只不死族", "只不死族",
+            "只野兽",   "只野兽",
+            "个巫师",   "个巫师"
         ],
 
-        TitleSpecies        = "The opponents he slained in each type:",
-        TitleRemarkableLow  = "The strong opponents he killed:",
-        TitleRemarkableBoss = "The Remarkable opponents he vanquished:",
-        TitleUniqueBoss     = "The Legenary opponents he conquered:",
+        TitleSpecies        = "他杀死的不同类型敌人列表：",
+        TitleRemarkableLow  = "他杀死的强大对手：",
+        TitleRemarkableBoss = "他杀死的非凡敌人：",
+        TitleUniqueBoss     = "他杀死的传奇怪物：",
 
         
-        NoBattleDay1        = "He is too fresh to meet his destiny.",
-        NoBattleDayN        = "He joined the company %d days, but has no kills yet.",
-        BattlePrefix1       = "He participate %d battle",
-        BattlePrefixN       = "He participate %d battles",
-        BattleDayN          = " in %d days",
-        BattleDay1          = " at the first day he join the company",
-        BattleDay0          = " without hesitate when he just join in the company",
-        BattleKill0         = " and has %d kill",
-        BattleKillN         = " and has %d kills",
-        BattleKillNWithNoRecords    = ", but we couldn't remember what things he killed.",
-        BattleKill0WithNoRecords    = ", but has no kills yet.",
+        NoBattleDay1        = "他即将刚开始谱写属于自己的传奇。",
+        NoBattleDayN        = "在加入战队%d天之后，仍未有所建树。",
+        BattlePrefix1       = "他只参加了%d场战斗，",
+        BattlePrefixN       = "他一共参加了%d场战斗，",
+        BattleDayN          = "于%d天之内",
+        BattleDay1          = "从他加入战队一天以后",
+        BattleDay0          = "自他第一天加入队伍以来",
+        BattleKill0         = "拿下了%d个首级",
+        BattleKillN         = "拿下了%d个首级",
+        BattleKillNWithNoRecords    = "，但小本本里忘了给不同敌人画下记号。",
+        BattleKill0WithNoRecords    = "，仍未有斩获。",
     }
 }
 
@@ -843,7 +843,7 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
 
         if(indexStart < ::KillingStats.ESpecies.Num)
         {
-            local description = format(", " + ::KillingStats.TooltipText.Including + " %d %s"
+            local description = format(::KillingStats.TooltipText.Comma + ::KillingStats.TooltipText.Including + "%d%s"
                     , this.m.KillingStats.Species[indexStart]
                     , ::KillingStats.TooltipText.SpeciesNames[(this.m.KillingStats.Species[indexStart] == 1 ? indexStart*2 : indexStart*2+1)]
             );
@@ -854,14 +854,14 @@ this.killing_stats <- this.inherit("scripts/skills/skill", {
                 {
                     if(this.m.KillingStats.Species[indexStart] > 0)
                     {
-                        description += format(::KillingStats.TooltipText.Comma + "%d %s"
+                        description += format(::KillingStats.TooltipText.Comma + "%d%s"
                             , this.m.KillingStats.Species[indexStart]
                             , ::KillingStats.TooltipText.SpeciesNames[(this.m.KillingStats.Species[indexStart] == 1 ? indexStart*2 : indexStart*2+1)]
                         );        
                     }
                 }
 
-                description += format(::KillingStats.TooltipText.And + "%d %s"
+                description += format(::KillingStats.TooltipText.And + "%d%s"
                     , this.m.KillingStats.Species[indexStart]
                     , ::KillingStats.TooltipText.SpeciesNames[(this.m.KillingStats.Species[indexStart] == 1 ? indexStart*2 : indexStart*2+1)]
                 );

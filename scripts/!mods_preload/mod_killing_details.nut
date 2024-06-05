@@ -12,8 +12,8 @@ local mod = ::Hooks.register
 );
 
 ::KillingDetails.TooltipText <- {
-    SavedCoins        = "Saved [img]gfx/ui/tooltips/money.png[/img]%d golds.",
-    FavoriteWeapon    = "His favorite weapon is %s."
+    SavedCoins        = "从战队里一共领取了[img]gfx/ui/tooltips/money.png[/img]%d枚金币。",
+    FavoriteWeapon    = "他最趁手的兵器是%s。"
 }
 
 mod.queue(function()
