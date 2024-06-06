@@ -1,6 +1,6 @@
 ::KillingDetails <- {
-    UniqueName    = "mod_killing_details",
-    Version        = "5.5.0",
+    UniqueName  = "mod_killing_details",
+    Version     = "5.6.0",
     Description = "Record Slained Enemies with MordenHook."
 }
 
@@ -14,6 +14,42 @@ local mod = ::Hooks.register
 ::KillingDetails.TooltipText <- {
     SavedCoins        = "从战队里一共领取了[img]gfx/ui/tooltips/money.png[/img]%d枚金币。",
     FavoriteWeapon    = "他最趁手的兵器是%s。"
+}
+
+::KillingDetails.HitchanceHook <- {
+
+    bAttackTacticLog = false,
+    
+    Chance = 0,
+    Rolled = 0,
+
+    function ExtractTacticLog(_text)
+    {
+        this.Chance = 0;
+        this.Rolled = 0;
+        if (this.bAttackTacticLog)
+        {
+            local textChance = " (Chance: ";
+            local textRolled = ", Rolled: ";
+            local textRolledEnd = ")";
+
+            local findChanceIndex = _text.find(textChance);
+            local findRolledIndex = _text.find(textRolled);
+
+            if(findChanceIndex != null && findRolledIndex != null)
+            {
+                local textRolledEndIndex = _text.find(textRolledEnd, findRolledIndex);
+                if(textRolledEndIndex != null)
+                {
+                    local chance = _text.slice(findChanceIndex + textChance.len(), findRolledIndex);
+                    local rolled = _text.slice(findRolledIndex + textRolled.len(), textRolledEndIndex);
+                    this.Chance = chance.tointeger();
+                    this.Rolled = rolled.tointeger();
+                }
+            }
+        }
+    }
+
 }
 
 mod.queue(function()
@@ -120,6 +156,26 @@ mod.queue(function()
                 }
             }
             __original( _worldState );
+        }
+    });
+
+    // Hit Chance Extract
+    mod.hook("scripts/ui/screens/tactical/modules/topbar/tactical_screen_topbar_event_log", function(q)
+    {
+        q.logEx = @(__original) function(_text)
+        {
+            ::KillingDetails.HitchanceHook.ExtractTacticLog(_text);
+            return __original(_text);
+        }
+    });
+    mod.hook("scripts/skills/skill", function(q)
+    {
+        q.attackEntity = @(__original) function( _user, _targetEntity, _allowDiversion = true )
+        {
+            ::KillingDetails.HitchanceHook.bAttackTacticLog = true;
+            local r = __original( _user, _targetEntity, _allowDiversion);
+            ::KillingDetails.HitchanceHook.bAttackTacticLog = false;
+            return r;
         }
     });
 });

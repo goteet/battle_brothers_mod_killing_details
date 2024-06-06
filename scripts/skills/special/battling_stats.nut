@@ -23,6 +23,7 @@
         LastBeingHitHead    = "被爆头=%d, 爆头率=%d%%, 伤害系数=%d%%",
 
         PerkExecutioner     = "有效触发%d次，有效率%d%%，有效触发率%d%%，触发%d次，触发率%d%%",
+        PerkFastAdaption    = "有效触发%d次，有效触发率%d%%，触发%d次，触发率%d%%",
         Perk9LPrefix        = "9命让你在战斗中濒死存活下来",
         Perk9LTimes1        = "一次。",
         Perk9LTimes2        = "两次。",
@@ -30,58 +31,57 @@
     }
 }
 
-
-
 this.battling_stats <- this.inherit("scripts/skills/skill", {
     m = 
     {
-        DamageDealtHeadHP = 0,
-        DamageDealtBodyHP = 0,
-        DamageDealtHelmet = 0,
-        DamageDealtArmor = 0,
-        MeleeAttack = 0,
-        MeleeLanded = 0,
-        RangeAttack = 0,
-        RangeLanded = 0,
-        HeadblowLanded = 0,
+        DamageDealtHeadHP   = 0,
+        DamageDealtBodyHP   = 0,
+        DamageDealtHelmet   = 0,
+        DamageDealtArmor    = 0,
+        MeleeAttack         = 0,
+        MeleeLanded         = 0,
+        RangeAttack         = 0,
+        RangeLanded         = 0,
+        HeadblowLanded      = 0,
         
         DamageReceiveHeadHP = 0,
         DamageReceiveBodyHP = 0,
         DamageReceiveHelmet = 0,
-        DamageReceiveArmor = 0,
-        BeingMeleeAttack = 0,
-        BeingMeleeLanded = 0,
-        BeingRangeAttack = 0,
-        BeingRangeLanded = 0,
+        DamageReceiveArmor  = 0,
+        BeingMeleeAttack    = 0,
+        BeingMeleeLanded    = 0,
+        BeingRangeAttack    = 0,
+        BeingRangeLanded    = 0,
         BeingHeadblowLanded = 0,
         
-        ExecutionerPerkAttack = 0,
-        ExecutionerPerkLanded = 0,
+        ExecutionerPerkAttack   = 0,
+        ExecutionerPerkLanded   = 0,
+        NineLivesPerkActivated  = 0,
+        FastAdaptionPerkAttack  = 0,
+        FastAdaptionPerkLanded  = 0,
 
-        NineLivesPerkActivated = 0,
-
-        LastDamageDealtBodyHP = 0,
-        LastDamageDealtHeadHP = 0,
-        LastDamageDealtHelmet = 0,
-        LastDamageDealtArmor = 0,
-        LastMeleeAttack = 0,
-        LastMeleeLanded = 0,
-        LastRangeAttack = 0,
-        LastRangeLanded = 0,
-        LastHeadblowLanded = 0,
+        LastDamageDealtBodyHP   = 0,
+        LastDamageDealtHeadHP   = 0,
+        LastDamageDealtHelmet   = 0,
+        LastDamageDealtArmor    = 0,
+        LastMeleeAttack         = 0,
+        LastMeleeLanded         = 0,
+        LastRangeAttack         = 0,
+        LastRangeLanded         = 0,
+        LastHeadblowLanded      = 0,
 
         LastDamageReceiveHeadHP = 0,
         LastDamageReceiveBodyHP = 0,
         LastDamageReceiveHelmet = 0,
-        LastDamageReceiveArmor = 0,
-        LastBeingMeleeAttack = 0,
-        LastBeingMeleeLanded = 0,
-        LastBeingRangeAttack = 0,
-        LastBeingRangeLanded = 0,
+        LastDamageReceiveArmor  = 0,
+        LastBeingMeleeAttack    = 0,
+        LastBeingMeleeLanded    = 0,
+        LastBeingRangeAttack    = 0,
+        LastBeingRangeLanded    = 0,
         LastBeingHeadblowLanded = 0,
         
-        NineLivesPerkActivatedThisBattle = 0,
-        ReceiveDamageBodyPartThisSkill = 0,
+        NineLivesPerkActivatedThisBattle    = 0,
+        ReceiveDamageBodyPartThisSkill      = 0,
     },
 
 
@@ -178,15 +178,33 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
         }
 
 
-        if(this.m.ExecutionerPerkAttack > 0 || this.m.NineLivesPerkActivated > 0)
+        if (this.m.ExecutionerPerkAttack > 0 || 
+            this.m.NineLivesPerkActivated > 0 ||
+            this.m.FastAdaptionPerkAttack > 0)
         {
             ret.push({ id = 30, type = "text", text = ::BattleStats.TooltipText.TitlePerks  });
+        }
+
+        if(this.m.FastAdaptionPerkAttack > 0)
+        {
+            ret.push({
+                id = 31,
+                type = "text",
+                icon = "ui/perks/perk_33.png",
+                text = format(::BattleStats.TooltipText.PerkFastAdaption
+                    , this.m.FastAdaptionPerkLanded
+                    , this.Math.round(100.0 * this.m.FastAdaptionPerkLanded / this.m.FastAdaptionPerkAttack)
+                    , this.m.FastAdaptionPerkAttack
+                    , this.Math.round(100.0 * this.m.FastAdaptionPerkAttack / (this.m.MeleeLanded + this.m.RangeLanded))
+                )
+            
+            });
         }
 
         if(this.m.ExecutionerPerkAttack > 0)
         {
             ret.push({
-                id = 31,
+                id = 32,
                 type = "text",
                 icon = "ui/perks/perk_16.png",
                 text = format(::BattleStats.TooltipText.PerkExecutioner
@@ -208,7 +226,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
                                         : this.m.NineLivesPerkActivated + ::BattleStats.TooltipText.Perk9LTimesN);
 
             ret.push({
-                id = 32,
+                id = 33,
                 type = "text",
                 icon = "ui/perks/perk_07.png",
                 text = ::BattleStats.TooltipText.Perk9LPrefix + timesText
@@ -356,6 +374,18 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
                     this.m.ExecutionerPerkLanded += 1;
                 }
                 this.m.ExecutionerPerkAttack += 1;
+            }
+
+            
+            local skillFastAdaption = this.getContainer().getSkillByID("perk.fast_adaption");
+            if(skillFastAdaption != null && skillFastAdaption.m.Stacks > 0)
+            {
+                local HitchanceAdditional = skillFastAdaption.m.Stacks * 10;
+                if(::KillingDetails.HitchanceHook.Chance - HitchanceAdditional < ::KillingDetails.HitchanceHook.Rolled)
+                {
+                    this.m.FastAdaptionPerkLanded +=1;
+                }
+                this.m.FastAdaptionPerkAttack +=1;
             }
         }
     }
@@ -544,7 +574,7 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
     {
         this.skill.onSerialize(_out);
         
-        local kCurrentSavingVersion = 4;
+        local kCurrentSavingVersion = 5;
         _out.writeU32(kCurrentSavingVersion);
 
         _out.writeU32(this.m.DamageDealtHeadHP);
@@ -591,6 +621,9 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
         _out.writeU32(this.m.ExecutionerPerkLanded);
 
         _out.writeU32(this.m.NineLivesPerkActivated);
+        
+        _out.writeU32(this.m.FastAdaptionPerkAttack);
+        _out.writeU32(this.m.FastAdaptionPerkLanded);
     }
 
     function onDeserialize( _in )
@@ -644,6 +677,12 @@ this.battling_stats <- this.inherit("scripts/skills/skill", {
             this.m.ExecutionerPerkLanded    = _in.readU32();
 
             this.m.NineLivesPerkActivated   = _in.readU32();
+
+            if(Version >= 5)
+            {
+                this.m.FastAdaptionPerkAttack = _in.readU32();
+                this.m.FastAdaptionPerkLanded = _in.readU32();
+            }
         }
         else if(Version >=2 && Version <= 3)
         {
